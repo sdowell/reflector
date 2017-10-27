@@ -4,10 +4,10 @@
 
 int main(int argc, char *argv[])
 {
-	char *victim_ip = "";
-	char *victim_eth = "";
-	char *relayer_ip = "";
-	char *relayer_eth = "";
+	char *victim_ip = NULL;
+	char *victim_eth = NULL;
+	char *relayer_ip = NULL;
+	char *relayer_eth = NULL;
 	char *interface = "eth0";
 	
 
@@ -44,7 +44,12 @@ int main(int argc, char *argv[])
 			break;
     		}
 	}
-	printf("Victim_ip = %s, victim_eth = %s\n relayer_ip = %s, relayer_eth = %s\n device = %s\n", victim_ip, victim_eth, relayer_ip, relayer_eth, interface);
+	printf("Victim_ip = %s, victim_eth = %s\nrelayer_ip = %s, relayer_eth = %s\ndevice = %s\n", victim_ip, victim_eth, relayer_ip, relayer_eth, interface);
+	
+	if (victim_ip == NULL || victim_eth == NULL || relayer_eth == NULL || relayer_ip == NULL){
+		printf("Missing args\n");
+		exit()
+	}
 	
 	char *dev, errbuf[PCAP_ERRBUF_SIZE];
 
