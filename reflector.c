@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
              		victim_eth = optarg; // or copy it if you want to
              		break;
 		case 'c':
-			interface = optarg
+			interface = optarg;
 			break;
 		case 'd':
 			relayer_ip = optarg;
