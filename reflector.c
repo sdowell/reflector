@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
             {"relayer-ethernet",    required_argument, NULL,  'e' },
             {0,         0,                 0,  0 }
         };
+	char ch;
 	while ((ch = getopt_long(argc, argv, "", long_options, NULL)) != -1)
 	{
     		// check to see if a single character or long option came through
