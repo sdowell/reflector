@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 	
 	if (victim_ip == NULL || victim_eth == NULL || relayer_eth == NULL || relayer_ip == NULL){
 		printf("Missing args\n");
-		exit();
+		return(0);
 	}
 	
 	char *dev, errbuf[PCAP_ERRBUF_SIZE];
