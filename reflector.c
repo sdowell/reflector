@@ -155,6 +155,9 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	const u_char *packet;		/* The actual packet */
 	packet = pcap_next(handle, &header);
 	printf("Jacked a packet with length of [%d]\n", header.len);
+	if(packet == NULL){
+		printf("Error: packet is null pointer\n");	
+	}
 	// Send response from victim to attacker
 	printf("Sending response from victim to attacker\n");
 	const struct sniff_ethernet *new_ethernet; /* The ethernet header */
