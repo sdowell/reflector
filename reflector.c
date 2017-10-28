@@ -115,7 +115,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
             printf("%c", *temp_pointer);
             temp_pointer++;
         }
-	eptr = (struct ether_header *) packet;
+	struct ether_header *eptr = (struct ether_header *) packet;
 	/* Do a couple of checks to see what packet type we have..*/
 	if (ntohs (eptr->ether_type) == ETHERTYPE_IP)
     	{
