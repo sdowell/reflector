@@ -107,7 +107,7 @@ void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_
 		return;
 	}
 	const u_char *new_ip_payload = (u_char *)(packet + SIZE_ETHERNET + size_ip);
-	u_int32_t new_ip_payload_s = header.len - (SIZE_ETHERNET + size_ip);
+	u_int32_t new_ip_payload_s = header->len - (SIZE_ETHERNET + size_ip);
 	// Construct IP header
 	printf("Constructing IP header\n");
 	if (libnet_build_ipv4 (new_ip->ip_len,
@@ -131,7 +131,7 @@ void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_
     		libnet_destroy(ln_context);
     		exit(0);
   	}
-	bytes_written = libnet_write(ln_context);
+	int bytes_written = libnet_write(ln_context);
 	if ( bytes_written != -1 )
     		printf("%d bytes written.\n", bytes_written);
   	else
