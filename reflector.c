@@ -160,7 +160,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	const struct sniff_ethernet *new_ethernet; /* The ethernet header */
 	const struct sniff_ip *new_ip; /* The IP header */
 	const struct sniff_tcp *new_tcp; /* The TCP header */
-
+	printf("Packet address: %p\n", packet);
 	u_int size_ip;
 	u_int size_tcp;
 	printf("Initialized variables\n");
