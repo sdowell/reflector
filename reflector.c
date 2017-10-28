@@ -155,7 +155,6 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	const struct sniff_ethernet *new_ethernet; /* The ethernet header */
 	const struct sniff_ip *new_ip; /* The IP header */
 	const struct sniff_tcp *new_tcp; /* The TCP header */
-	const u_char *new_payload; /* Packet payload */
 
 	u_int size_ip;
 	u_int size_tcp;	
@@ -173,7 +172,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 		return;
 	}
 	const u_char *new_ip_payload = (u_char *)(packet + SIZE_ETHERNET + size_ip);
-	u_int32_t new_ip_payload_s = header->len - (SIZE_ETHERNET + size_ip);
+	u_int32_t new_ip_payload_s = header.len - (SIZE_ETHERNET + size_ip);
 	// Construct IP header
 	if (libnet_build_ipv4 (new_ip->ip_len,
     		new_ip->ip_tos, new_ip->ip_id, new_ip->ip_off,
@@ -195,7 +194,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
     		libnet_destroy(ln_context);
     		exit(0);
   	}
-	int bytes_written = libnet_write(ln_context);
+	bytes_written = libnet_write(ln_context);
 	if ( bytes_written != -1 )
     		printf("%d bytes written.\n", bytes_written);
   	else
