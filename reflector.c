@@ -82,8 +82,22 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 		return;
 	}
 	payload = (u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp);
-	printf("Received packet. Source IP: %s, Source eth: %s\nDest IP: %s, Dest eth: %s\nPayload:\n%u", 
-	       inet_ntoa(ip->ip_src), ether_ntoa(ethernet->ether_shost), inet_ntoa(ip->ip_dst),ether_ntoa(ethernet->ether_dhost), payload);
+	printf("Received packet. Source IP: %s, Source eth: %s\nDest IP: %s, Dest eth: %s\n", 
+	       inet_ntoa(ip->ip_src), ether_ntoa(ethernet->ether_shost), inet_ntoa(ip->ip_dst),ether_ntoa(ethernet->ether_dhost));
+	printf("Payload:\n");
+	/* Print payload in ASCII */
+       int payload_length = header->caplen -
+        (SIZE_ETHERNET + size_ip + size_tcp);
+    if (payload_length > 0) {
+        const u_char *temp_pointer = payload;
+        int byte_count = 0;
+        while (byte_count++ < payload_length) {
+            printf("%c", *temp_pointer);
+            temp_pointer++;
+        }
+        printf("\n");
+    }
+    
 	return;	
 }
 
