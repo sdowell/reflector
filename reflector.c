@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
 	strcat(filter_exp, victim_ip);
 	// Libnet initialization
 	char ln_errbuf[LIBNET_ERRBUF_SIZE];
-	ln_context = libnet_init(LIBNET_RAW4, NULL, ln_errbuf);
+	ln_context = libnet_init(LIBNET_LINK, NULL, ln_errbuf);
 	if ( ln_context == NULL ) {
 		fprintf(stderr, "libnet_init() failed: %s\n", ln_errbuf);
     		return(0);
