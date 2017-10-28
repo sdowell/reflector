@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <pcap.h>
 #include <getopt.h>
+#include <netinet/in.h>
 
 /* Ethernet addresses are 6 bytes */
 #define ETHER_ADDR_LEN	6
-
+#define SIZE_ETHERNET 14
 	/* Ethernet header */
 	struct sniff_ethernet {
 		u_char ether_dhost[ETHER_ADDR_LEN]; /* Destination host address */
