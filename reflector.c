@@ -64,6 +64,12 @@ int main(int argc, char *argv[])
 		return(2);
 	}
 	printf("Device: %s\n", dev);
+	// Find the properties for the device
+	if (pcap_lookupnet(dev, &net, &mask, errbuf) == -1) {
+		fprintf(stderr, "Couldn't get netmask for device %s: %s\n", dev, errbuf);
+		net = 0;
+		mask = 0;
+	}
 	pcap_t *handle;
 	// open the session
 	handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
