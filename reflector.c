@@ -106,10 +106,11 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	const char *s_host = strcpy((char *) malloc(strlen(aux)+1), aux);
 	aux = ether_ntoa((struct ether_addr *)ethernet->ether_dhost);
 	const char *d_host = strcpy((char *) malloc(strlen(aux)+1), aux);   
+	u_short s_port = tcp->th_sport;
+	u_short d_port = tcp->th_dport;
 	
-	
-	printf("Source IP: %s, Source eth: %s\nDest IP: %s, Dest eth: %s\n", 
-	       s_ipad, s_host, d_ipad, d_host);
+	printf("Source IP: %s, Source port: %hu, Source eth: %s\nDest IP: %s, Dest port: %hu, Dest eth: %s\n", 
+	       s_ipad, s_port, s_host, d_ipad, d_port, d_host);
 	       //inet_ntoa(ip->ip_src), ether_ntoa(ethernet->ether_shost), inet_ntoa(ip->ip_dst),ether_ntoa(ethernet->ether_dhost));
 	//delete[] s_ipad; delete[] d_ipad;delete[] s_host; delete[] d_host;
 	free((void *) s_ipad);
