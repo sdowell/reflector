@@ -128,8 +128,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 		return;
 	}
 	payload = (u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp);
-	ip_payload = (u_char *)(packet + SIZE_ETHERNET + size_ip);
-	ip_payload_s = header->len - (SIZE_ETHERNET + size_ip);
+	const u_char *ip_payload = (u_char *)(packet + SIZE_ETHERNET + size_ip);
+	u_int32_t ip_payload_s = header->len - (SIZE_ETHERNET + size_ip);
 	// Record source and dest addresses
 	const char *aux = inet_ntoa(ip->ip_src);
 	const char *s_ipad = strcpy((char *) malloc(strlen(aux)+1), aux);
