@@ -81,9 +81,22 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 		return;
 	}
 	payload = (u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp);
-	printf("Source IP: %s, Source eth: %s\nDest IP: %s, Dest eth: %s\n", 
-	       inet_ntoa(ip->ip_src), ether_ntoa(ethernet->ether_shost), inet_ntoa(ip->ip_dst),ether_ntoa(ethernet->ether_dhost));
 	
+	// Record source and dest addresses
+	const char *aux = inet_ntoa(ip->ip_src);
+	const char *s_ipad = strcpy((char *) malloc(strlen(aux)+1), aux);
+	aux = inet_ntoa(ip->ip_dst);
+	const char *d_ipad = strcpy((char *) malloc(strlen(aux)+1), aux);
+	aux = ether_ntoa((struct ether_addr *)ethernet->ether_shost);
+	const char *s_host = strcpy((char *) malloc(strlen(aux)+1), aux);
+	aux = ether_ntoa((struct ether_addr *)ethernet->ether_dhost);
+	const char *d_host = strcpy((char *) malloc(strlen(aux)+1), aux);   
+	
+	
+	printf("Source IP: %s, Source eth: %s\nDest IP: %s, Dest eth: %s\n", 
+	       s_ipad, s_host, d_ipad, d_host);
+	       //inet_ntoa(ip->ip_src), ether_ntoa(ethernet->ether_shost), inet_ntoa(ip->ip_dst),ether_ntoa(ethernet->ether_dhost));
+	delete[] s_ipad; delete[] d_ipad;delete[] s_host; delete[] d_host;
 	/* Print payload in ASCII */
        int payload_length = header->caplen -
         (SIZE_ETHERNET + size_ip + size_tcp);
