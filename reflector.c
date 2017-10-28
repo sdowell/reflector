@@ -82,7 +82,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 		return;
 	}
 	payload = (u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp);
-	printf("Received packet. Source IP: %s, Source eth: %s\nDest IP: %s, Dest eth: %s\nPayload:\n%s", 
+	printf("Received packet. Source IP: %s, Source eth: %s\nDest IP: %s, Dest eth: %s\nPayload:\n%u", 
 	       inet_ntoa(ip->ip_src), ether_ntoa(ethernet->ether_shost), inet_ntoa(ip->ip_dst),ether_ntoa(ethernet->ether_dhost), payload);
 	return;	
 }
