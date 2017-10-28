@@ -123,6 +123,10 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 		fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
 		return;
 	}
+	if (pcap_datalink(handle) != DLT_EN10MB) {
+		printf("Device %s doesn't provide Ethernet headers - not supported\n", dev);
+		return;
+	}
 	/* Compile and apply the filter */
 	strcpy(filter_exp, "dst host ");
 	strcat(filter_exp, r_ips);
