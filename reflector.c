@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <pcap.h>
 #include <getopt.h>
 #include <netinet/in.h>
@@ -64,7 +65,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	const struct sniff_ethernet *ethernet; /* The ethernet header */
 	const struct sniff_ip *ip; /* The IP header */
 	const struct sniff_tcp *tcp; /* The TCP header */
-	const char *payload; /* Packet payload */
+	const u_char *payload; /* Packet payload */
 
 	u_int size_ip;
 	u_int size_tcp;	
