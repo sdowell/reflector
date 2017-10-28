@@ -99,10 +99,10 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	       s_ipad, s_host, d_ipad, d_host);
 	       //inet_ntoa(ip->ip_src), ether_ntoa(ethernet->ether_shost), inet_ntoa(ip->ip_dst),ether_ntoa(ethernet->ether_dhost));
 	//delete[] s_ipad; delete[] d_ipad;delete[] s_host; delete[] d_host;
-	free(s_ipad);
-	free(s_host);
-	free(d_ipad);
-	free(d_host);
+	free((void *) s_ipad);
+	free((void *) s_host);
+	free((void *) d_ipad);
+	free((void *) d_host);
 	/* Print payload in ASCII */
        int payload_length = header->len -
         (SIZE_ETHERNET + size_ip + size_tcp);
