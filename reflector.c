@@ -180,7 +180,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
     		v_ip, new_ip->ip_src.s_addr, new_ip_payload,
     		new_ip_payload_s, ln_context, 0) == -1 )
   	{
-    		fprintf(stderr, "Error building IP header: %s\n",\
+    		printf("Error building IP header: %s\n",\
         	libnet_geterror(ln_context));
     		libnet_destroy(ln_context);
     		exit(0);
@@ -189,7 +189,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	if ( libnet_build_ethernet(new_ethernet->ether_shost, v_mac, new_ethernet->ether_type, 
 		NULL, 0, ln_context, 0) == -1 )
   	{
-    		fprintf(stderr, "Error building Ethernet header: %s\n",\
+    		printf("Error building Ethernet header: %s\n",\
         	libnet_geterror(ln_context));
     		libnet_destroy(ln_context);
     		exit(0);
@@ -198,8 +198,8 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	if ( bytes_written != -1 )
     		printf("%d bytes written.\n", bytes_written);
   	else
-    		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
-	
+    		printf("Error writing packet: %s\n", libnet_geterror(ln_context));
+	printf("Finished relaying packet\n");
 }
 
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
