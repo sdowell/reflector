@@ -208,19 +208,19 @@ int main(int argc, char *argv[])
 	}
 	// Libnet initialization
 	char ln_errbuf[LIBNET_ERRBUF_SIZE];
-	l = libnet_init(LIBNET_RAW4, NULL, ln_errbuf);
-	if ( l == NULL ) {
+	ln_context = libnet_init(LIBNET_RAW4, NULL, ln_errbuf);
+	if ( ln_context == NULL ) {
 		fprintf(stderr, "libnet_init() failed: %s\n", ln_errbuf);
     		return(0);
   	}
 	
-	v_ip = libnet_name2addr4(l, victim_ip,\
+	v_ip = libnet_name2addr4(ln_context, victim_ip,\
                   LIBNET_DONT_RESOLVE);
 	if(v_ip == -1){
 		printf("Error converting victim ip address\n");
 		return(0);
 	}
-	r_ip = libnet_name2addr4(l, relayer_ip,\
+	r_ip = libnet_name2addr4(ln_context, relayer_ip,\
                   LIBNET_DONT_RESOLVE);
 	if(r_ip == -1){
 		printf("Error converting relayer ip address\n");
