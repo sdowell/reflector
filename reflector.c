@@ -104,6 +104,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	/* Find the properties for the device */
 	bpf_u_int32 mask;		/* Our netmask */
 	bpf_u_int32 net;		/* Our IP */
+	char errbuf[PCAP_ERRBUF_SIZE];	/* Error string */
 	if (pcap_lookupnet(dev, &net, &mask, errbuf) == -1) {
 		fprintf(stderr, "Couldn't get netmask for device %s: %s\n", dev, errbuf);
 		net = 0;
@@ -119,13 +120,13 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	}
 	/* Compile and apply the filter */
 	strcpy(filter_exp, "dst host ");
-	strcat(filter_exp, r_ip);
+	strcat(filter_exp, itoa(r_ip));
 	strcat(filter_exp, " and src host ");
 	strcat(filter_exp, inet_ntoa(ip->ip_src));
 	strcat(filter_exp, " and dst port ");
-	strcat(filter_exp, tcp->th_sport);
+	strcat(filter_exp, itoa(tcp->th_sport));
 	strcat(filter_exp, " and src port ");
-	strcat(filter_exp, tcp->th_dport);
+	strcat(filter_exp, itoa(tcp->th_dport));
 	printf("Filter string: %s\n", filter_exp);
 	if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
 		fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
