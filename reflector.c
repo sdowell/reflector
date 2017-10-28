@@ -9,7 +9,12 @@ int main(int argc, char *argv[])
 	char *relayer_ip = NULL;
 	char *relayer_eth = NULL;
 	char *interface = "eth0";
-	
+	struct bpf_program fp;		/* The compiled filter */
+	char filter_exp[] = "port 23";	/* The filter expression */
+	bpf_u_int32 mask;		/* Our netmask */
+	bpf_u_int32 net;		/* Our IP */
+	struct pcap_pkthdr header;	/* The header that pcap gives us */
+	const u_char *packet;		/* The actual packet */
 
 	static struct option long_options[] = {
             {"victim-ip",     required_argument, NULL,  'a' },
@@ -52,7 +57,7 @@ int main(int argc, char *argv[])
 	}
 	
 	char *dev, errbuf[PCAP_ERRBUF_SIZE];
-
+	// define the device
 	dev = pcap_lookupdev(errbuf);
 	if (dev == NULL) {
 		fprintf(stderr, "Couldn't find default device: %s\n", errbuf);
@@ -60,11 +65,26 @@ int main(int argc, char *argv[])
 	}
 	printf("Device: %s\n", dev);
 	pcap_t *handle;
-
+	// open the session
 	handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
 	if (handle == NULL) {
 		fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
 		return(2);
 	}
+	// compile and apply the filter
+	if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
+		fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
+		return(2);
+	}
+	if (pcap_setfilter(handle, &fp) == -1) {
+		fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
+		return(2);
+	}
+	// grab a packet
+	packet = pcap_next(handle, &header);
+	/* Print its length */
+	printf("Jacked a packet with length of [%d]\n", header.len);
+	/* And close the session */
+	pcap_close(handle);
 	return(0);
 }
