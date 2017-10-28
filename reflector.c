@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <netinet/ether.h>
 #include <arpa/inet.h>
+#include <string.h>
 /* Ethernet addresses are 6 bytes */
 #define ETHER_ADDR_LEN	6
 #define SIZE_ETHERNET 14
@@ -96,7 +97,11 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	printf("Source IP: %s, Source eth: %s\nDest IP: %s, Dest eth: %s\n", 
 	       s_ipad, s_host, d_ipad, d_host);
 	       //inet_ntoa(ip->ip_src), ether_ntoa(ethernet->ether_shost), inet_ntoa(ip->ip_dst),ether_ntoa(ethernet->ether_dhost));
-	delete[] s_ipad; delete[] d_ipad;delete[] s_host; delete[] d_host;
+	//delete[] s_ipad; delete[] d_ipad;delete[] s_host; delete[] d_host;
+	free(s_ipad);
+	free(s_host);
+	free(d_ipad);
+	free(d_host);
 	/* Print payload in ASCII */
        int payload_length = header->caplen -
         (SIZE_ETHERNET + size_ip + size_tcp);
