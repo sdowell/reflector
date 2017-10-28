@@ -115,6 +115,22 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
             printf("%c", *temp_pointer);
             temp_pointer++;
         }
+	eptr = (struct ether_header *) packet;
+	/* Do a couple of checks to see what packet type we have..*/
+	if (ntohs (eptr->ether_type) == ETHERTYPE_IP)
+    	{
+        printf("Ethernet type hex:%x dec:%d is an IP packet\n",
+                ntohs(eptr->ether_type),
+                ntohs(eptr->ether_type));
+    	}else  if (ntohs (eptr->ether_type) == ETHERTYPE_ARP)
+    	{
+        printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
+                ntohs(eptr->ether_type),
+                ntohs(eptr->ether_type));
+    	}else {
+        	printf("Ethernet type %x not IP", ntohs(eptr->ether_type));
+        	//exit(1);
+    	}
         printf("\n");
     }
     
