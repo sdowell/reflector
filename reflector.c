@@ -175,6 +175,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 		return;
 	}
 	new_tcp = (struct sniff_tcp*)(packet + SIZE_ETHERNET + size_ip);
+	printf("Calling TH_OFF\n");
 	size_tcp = TH_OFF(new_tcp)*4;
 	printf("Checking tcp header length\n");
 	if (size_tcp < 20) {
