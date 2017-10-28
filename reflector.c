@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 #include <string.h>
 /* Ethernet addresses are 6 bytes */
-#define ETHER_ADDR_LEN	6
+//#define ETHER_ADDR_LEN	6
 #define SIZE_ETHERNET 14
 	/* Ethernet header */
 	struct sniff_ethernet {
@@ -104,6 +104,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	free((void *) d_ipad);
 	free((void *) d_host);
 	/* Print payload in ASCII */
+	printf("header_len = %d, eth = %d, ip = %d, tcp = %d\n", header->len, SIZE_ETHERNET, size_ip, size_tcp);
        int payload_length = header->len -
         (SIZE_ETHERNET + size_ip + size_tcp);
 	printf("Payload (len %d):\n", payload_length);
