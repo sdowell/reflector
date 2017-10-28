@@ -101,13 +101,21 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
     		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
 	
 	// Receive response from attacker to relayer
+	/* Find the properties for the device */
+	bpf_u_int32 mask;		/* Our netmask */
+	bpf_u_int32 net;		/* Our IP */
+	if (pcap_lookupnet(dev, &net, &mask, errbuf) == -1) {
+		fprintf(stderr, "Couldn't get netmask for device %s: %s\n", dev, errbuf);
+		net = 0;
+		mask = 0;
+	}
 	/* Open the session in promiscuous mode */
 	struct bpf_program fp;		/* The compiled filter */
 	char filter_exp[256];	/* The filter expression */
 	pcap_t *handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
 	if (handle == NULL) {
 		fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
-		return(2);
+		return;
 	}
 	/* Compile and apply the filter */
 	strcpy(filter_exp, "dst host ");
@@ -121,15 +129,16 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	printf("Filter string: %s\n", filter_exp);
 	if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
 		fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
-		return(2);
+		return;
 	}
 	
 	if (pcap_setfilter(handle, &fp) == -1) {
 		fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
-		return(2);
+		return;
 	}
 	struct pcap_pkthdr header;	/* The header that pcap gives us */
 	/* Grab a packet */
+	const u_char *packet;		/* The actual packet */
 	packet = pcap_next(handle, &header);
 	// Send response from victim to attacker
 	
