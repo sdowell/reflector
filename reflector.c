@@ -141,7 +141,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	sprintf(dport, "%hu", tcp->th_dport);
 	strcat(filter_exp, dport);
 	printf("Filter string: %s\n", filter_exp);
-	if (pcap_compile(handle, &fp, filter_exp, 0, r_ip) == -1) {
+	if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
 		fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
 		return;
 	}
@@ -156,7 +156,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	packet = pcap_next(handle, &header);
 	printf("Jacked a packet with length of [%d]\n", header.len);
 	if(packet == NULL){
-		printf("Error: packet is null pointer\n");
+		printf("Error: packet is null pointer - %s\n", pcap_geterr(handle));
 		return;
 	}
 	// Send response from victim to attacker
@@ -414,7 +414,10 @@ int main(int argc, char *argv[])
 		net = 0;
 		mask = 0;
 	}
-	printf("Net id: %u\n", inet_ntoa(net));
+	unsigned char *ip_string = &value;
+	struct in_addr ip_addr;
+    	ip_addr.s_addr = net;
+	printf("Net id: %u\n", inet_ntoa(ip_addr));
 	pcap_t *handle;
 	// open the session
 	handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
@@ -423,7 +426,7 @@ int main(int argc, char *argv[])
 		return(2);
 	}
 	// compile and apply the filter
-	if (pcap_compile(handle, &fp, filter_exp, 0, v_ip) == -1) {
+	if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
 		fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
 		return(2);
 	}
