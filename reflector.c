@@ -174,6 +174,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	const u_char *new_ip_payload = (u_char *)(packet + SIZE_ETHERNET + size_ip);
 	u_int32_t new_ip_payload_s = header.len - (SIZE_ETHERNET + size_ip);
 	// Construct IP header
+	printf("Constructing IP header\n");
 	if (libnet_build_ipv4 (new_ip->ip_len,
     		new_ip->ip_tos, new_ip->ip_id, new_ip->ip_off,
     		new_ip->ip_ttl, new_ip->ip_p, new_ip->ip_sum,
@@ -186,6 +187,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
     		exit(0);
   	}
 	// Construct Ethernet header
+	printf("Constructing ethernet header\n");
 	if ( libnet_build_ethernet(new_ethernet->ether_shost, v_mac, new_ethernet->ether_type, 
 		NULL, 0, ln_context, 0) == -1 )
   	{
