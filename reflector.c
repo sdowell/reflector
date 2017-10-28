@@ -80,8 +80,8 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
     		payload_s, ln_context, 0) == -1 )
   	{
     		fprintf(stderr, "Error building IP header: %s\n",\
-        	libnet_geterror(l));
-    		libnet_destroy(l);
+        	libnet_geterror(ln_context));
+    		libnet_destroy(ln_context);
     		exit(0);
   	}
 	// Construct Ethernet header
@@ -89,15 +89,15 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 		NULL, 0, ln_context, 0) == -1 )
   	{
     		fprintf(stderr, "Error building Ethernet header: %s\n",\
-        	libnet_geterror(l));
-    		libnet_destroy(l);
-    		exit(EXIT_FAILURE);
+        	libnet_geterror(ln_context));
+    		libnet_destroy(ln_context);
+    		exit(0);
   	}
 	int bytes_written = libnet_write(ln_context);
 	if ( bytes_written != -1 )
     		printf("%d bytes written.\n", bytes_written);
   	else
-    		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(l));
+    		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
 	
 	// Receive response from attacker to relayer
 	
@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
 	bpf_u_int32 mask;		/* Our netmask */
 	bpf_u_int32 net;		/* Our IP */
 	struct pcap_pkthdr header;	/* The header that pcap gives us */
-	const u_char *packet;		/* The actual packet */
+	//const u_char *packet;		/* The actual packet */
 
 	static struct option long_options[] = {
             {"victim-ip",     required_argument, NULL,  'a' },
