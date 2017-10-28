@@ -60,6 +60,15 @@
 		u_short th_urp;		/* urgent pointer */
 };
 
+u_int32_t v_ip;
+u_int32_t r_ip;
+u_int8_t v_mac;
+u_int8_t r_mac;
+
+void relay_IP(){
+	
+}
+
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
 	printf("Received packet\n");
 	const struct sniff_ethernet *ethernet; /* The ethernet header */
@@ -146,6 +155,7 @@ int main(int argc, char *argv[])
 	char *relayer_ip = NULL;
 	char *relayer_eth = NULL;
 	char *interface = "eth0";
+	int length;
 	struct bpf_program fp;		/* The compiled filter */
 	char filter_exp[] = "port 8000";	/* The filter expression */
 	bpf_u_int32 mask;		/* Our netmask */
@@ -190,6 +200,28 @@ int main(int argc, char *argv[])
 	
 	if (victim_ip == NULL || victim_eth == NULL || relayer_eth == NULL || relayer_ip == NULL){
 		printf("Missing args\n");
+		return(0);
+	}
+	v_ip = libnet_name2addr4(l, victim_ip,\
+                  LIBNET_DONT_RESOLVE);
+	if(v_ip == -1){
+		printf("Error converting victim ip address\n");
+		return(0);
+	}
+	r_ip = libnet_name2addr4(l, relayer_ip,\
+                  LIBNET_DONT_RESOLVE);
+	if(r_ip == -1){
+		printf("Error converting relayer ip address\n");
+		return(0);
+	}
+	v_mac = libnet_hex_aton(victim_eth, &length);
+	if(v_mac == NULL){
+		printf("Error converting victim mac address\n");
+		return(0);
+	}
+	r_mac = libnet_hex_aton(relayer_eth, &length);
+	if(r_mac == NULL){
+		printf("Error converting relayer mac address\n");
 		return(0);
 	}
 	
