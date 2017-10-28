@@ -165,6 +165,8 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	u_int size_tcp;
 	printf("Initialized variables\n");
 	new_ethernet = (struct sniff_ethernet*)(packet);
+	printf("Ethernet type: %hu\n", new_ethernet->ether_type);
+	
 	new_ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
 	printf("Calling IP_HL: ");
 	printf("%u\n", new_ip->ip_vhl);
