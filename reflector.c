@@ -129,11 +129,11 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	strcat(filter_exp, inet_ntoa(ip->ip_src));
 	strcat(filter_exp, " and dst port ");
 	char sport[16];
-	itoa(tcp->th_sport, sport, 10);
+	sprintf(sport, "%hu", tcp->th_sport);
 	strcat(filter_exp, sport);
 	strcat(filter_exp, " and src port ");
 	char dport[16];
-	itoa(tcp->th_dport, dport, 10);
+	sprintf(dport, "%hu", tcp->th_dport);
 	strcat(filter_exp, dport);
 	printf("Filter string: %s\n", filter_exp);
 	if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
