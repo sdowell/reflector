@@ -106,7 +106,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 }
 
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
-	printf("Received packet\n");
+	printf("Received packet of size %d\n", header->len);
 	const struct sniff_ethernet *ethernet; /* The ethernet header */
 	const struct sniff_ip *ip; /* The IP header */
 	const struct sniff_tcp *tcp; /* The TCP header */
