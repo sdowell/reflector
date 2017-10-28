@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
 	char *interface = "eth0";
 	int length;
 	struct bpf_program fp;		/* The compiled filter */
-	char filter_exp[] = "port 8000";	/* The filter expression */
+	char filter_exp[32];	/* The filter expression */
 	bpf_u_int32 mask;		/* Our netmask */
 	bpf_u_int32 net;		/* Our IP */
 	struct pcap_pkthdr header;	/* The header that pcap gives us */
@@ -206,6 +206,8 @@ int main(int argc, char *argv[])
 		printf("Missing args\n");
 		return(0);
 	}
+	strcpy(filter_exp, "dst host ");
+	strcat(filter_exp, victim_ip);
 	// Libnet initialization
 	char ln_errbuf[LIBNET_ERRBUF_SIZE];
 	ln_context = libnet_init(LIBNET_RAW4, NULL, ln_errbuf);
