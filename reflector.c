@@ -219,7 +219,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	struct pcap_pkthdr header;	/* The header that pcap gives us */
 	/* Grab a packet */
 	const u_char *packet;		/* The actual packet */
-	pcap_loop(handle, 1, relayer_got_packet, NULL);
+	pcap_dispatch(handle, 1, relayer_got_packet, NULL);
 	printf("Done waiting for response\n");
 	return;
 	packet = pcap_next(handle, &header);
