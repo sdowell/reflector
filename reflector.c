@@ -65,9 +65,13 @@
 };
 
 u_int32_t v_ip;
+char *v_ips;
 u_int32_t r_ip;
+char *r_ips;
 u_int8_t *v_mac;
+char *v_macs;
 u_int8_t *r_mac;
+char *r_macs;
 libnet_t *ln_context;
 char dev[32];
 void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const struct sniff_tcp *tcp, const u_char *payload, u_int32_t payload_s){
@@ -120,13 +124,17 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	}
 	/* Compile and apply the filter */
 	strcpy(filter_exp, "dst host ");
-	strcat(filter_exp, inet_ntoa(r_ip));
+	strcat(filter_exp, r_ips);
 	strcat(filter_exp, " and src host ");
 	strcat(filter_exp, inet_ntoa(ip->ip_src));
 	strcat(filter_exp, " and dst port ");
-	strcat(filter_exp, ether_ntoa(tcp->th_sport));
+	char sport[16];
+	itoa(tcp->th_sport, sport, 10);
+	strcat(filter_exp, sport);
 	strcat(filter_exp, " and src port ");
-	strcat(filter_exp, ether_ntoa(tcp->th_dport));
+	char dport[16];
+	itoa(tcp->th_dport, dport, 10);
+	strcat(filter_exp, dport);
 	printf("Filter string: %s\n", filter_exp);
 	if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
 		fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
@@ -290,24 +298,27 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "libnet_init() failed: %s\n", ln_errbuf);
     		return(0);
   	}
-	
+	v_ips = victim_ip;
 	v_ip = libnet_name2addr4(ln_context, victim_ip,\
                   LIBNET_DONT_RESOLVE);
 	if(v_ip == -1){
 		printf("Error converting victim ip address\n");
 		return(0);
 	}
+	r_ips = relayer_ip;
 	r_ip = libnet_name2addr4(ln_context, relayer_ip,\
                   LIBNET_DONT_RESOLVE);
 	if(r_ip == -1){
 		printf("Error converting relayer ip address\n");
 		return(0);
 	}
+	v_macs = victim_eth;
 	v_mac = libnet_hex_aton(victim_eth, &length);
 	if(v_mac == NULL){
 		printf("Error converting victim mac address\n");
 		return(0);
 	}
+	r_macs = relayer_eth;
 	r_mac = libnet_hex_aton(relayer_eth, &length);
 	if(r_mac == NULL){
 		printf("Error converting relayer mac address\n");
