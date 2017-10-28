@@ -59,6 +59,8 @@
 };
 
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
+	printf("Received packet\n");
+	printf("%s\n", packet);
 	const struct sniff_ethernet *ethernet; /* The ethernet header */
 	const struct sniff_ip *ip; /* The IP header */
 	const struct sniff_tcp *tcp; /* The TCP header */
