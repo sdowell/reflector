@@ -167,8 +167,8 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	new_ethernet = (struct sniff_ethernet*)(packet);
 	new_ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
 	printf("Calling IP_HL\n");
-	//size_ip = (((new_ip)->ip_vhl) & 0x0f)*4;
-	size_ip = 20;
+	size_ip = IP_HL(new_ip)*4;
+	//size_ip = 20;
 	printf("Checking ip header length\n");
 	if (size_ip < 20) {
 		printf("   * Invalid IP header length: %u bytes\n", size_ip);
