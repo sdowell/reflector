@@ -68,7 +68,7 @@ u_int32_t v_ip;
 u_int32_t r_ip;
 u_int8_t *v_mac;
 u_int8_t *r_mac;
-
+libnet_t *ln_context;
 void relay_IP(){
 	
 }
@@ -206,6 +206,14 @@ int main(int argc, char *argv[])
 		printf("Missing args\n");
 		return(0);
 	}
+	// Libnet initialization
+	char ln_errbuf[LIBNET_ERRBUF_SIZE];
+	l = libnet_init(LIBNET_RAW4, NULL, ln_errbuf);
+	if ( l == NULL ) {
+		fprintf(stderr, "libnet_init() failed: %s\n", ln_errbuf);
+    		return(0);
+  	}
+	
 	v_ip = libnet_name2addr4(l, victim_ip,\
                   LIBNET_DONT_RESOLVE);
 	if(v_ip == -1){
