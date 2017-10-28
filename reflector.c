@@ -141,7 +141,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	sprintf(dport, "%hu", tcp->th_dport);
 	strcat(filter_exp, dport);
 	printf("Filter string: %s\n", filter_exp);
-	if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
+	if (pcap_compile(handle, &fp, filter_exp, 0, r_ip) == -1) {
 		fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
 		return;
 	}
@@ -422,7 +422,7 @@ int main(int argc, char *argv[])
 		return(2);
 	}
 	// compile and apply the filter
-	if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
+	if (pcap_compile(handle, &fp, filter_exp, 0, v_ip) == -1) {
 		fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
 		return(2);
 	}
