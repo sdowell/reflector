@@ -161,6 +161,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	printf("Initialized variables\n");
 	new_ethernet = (struct sniff_ethernet*)(packet);
 	new_ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
+	printf("Calling IP_HL\n");
 	size_ip = IP_HL(new_ip)*4;
 	printf("Checking ip header length\n");
 	if (size_ip < 20) {
