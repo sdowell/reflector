@@ -428,7 +428,8 @@ int main(int argc, char *argv[])
 		printf("Missing args\n");
 		return(0);
 	}
-	strcpy(filter_exp, "dst port 22 and dst host ");
+	//strcpy(filter_exp, "dst port 8000 and dst host ");
+	strcpy(filter_exp, "dst host ");
 	strcat(filter_exp, victim_ip);
 	// Libnet initialization
 	char ln_errbuf[LIBNET_ERRBUF_SIZE];
