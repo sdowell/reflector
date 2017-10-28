@@ -414,10 +414,9 @@ int main(int argc, char *argv[])
 		net = 0;
 		mask = 0;
 	}
-	unsigned char *ip_string = &value;
 	struct in_addr ip_addr;
     	ip_addr.s_addr = net;
-	printf("Net id: %u\n", inet_ntoa(ip_addr));
+	printf("Net id: %s\n", inet_ntoa(ip_addr));
 	pcap_t *handle;
 	// open the session
 	handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
