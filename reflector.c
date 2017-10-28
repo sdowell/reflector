@@ -157,7 +157,8 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	const struct sniff_tcp *new_tcp; /* The TCP header */
 
 	u_int size_ip;
-	u_int size_tcp;	
+	u_int size_tcp;
+	printf("Initialized variables\n");
 	new_ethernet = (struct sniff_ethernet*)(packet);
 	new_ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
 	size_ip = IP_HL(new_ip)*4;
