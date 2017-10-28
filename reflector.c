@@ -6,6 +6,10 @@
 #include <netinet/ether.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <libnet.h>
+#include <stdint.h>
+
+
 /* Ethernet addresses are 6 bytes */
 //#define ETHER_ADDR_LEN	6
 #define SIZE_ETHERNET 14
@@ -62,8 +66,8 @@
 
 u_int32_t v_ip;
 u_int32_t r_ip;
-u_int8_t v_mac;
-u_int8_t r_mac;
+u_int8_t *v_mac;
+u_int8_t *r_mac;
 
 void relay_IP(){
 	
