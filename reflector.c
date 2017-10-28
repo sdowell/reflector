@@ -103,7 +103,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	free(d_ipad);
 	free(d_host);
 	/* Print payload in ASCII */
-       int payload_length = header->caplen -
+       int payload_length = header->len -
         (SIZE_ETHERNET + size_ip + size_tcp);
 	printf("Payload (len %d):\n", payload_length);
     if (payload_length > 0) {
