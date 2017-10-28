@@ -414,6 +414,7 @@ int main(int argc, char *argv[])
 		net = 0;
 		mask = 0;
 	}
+	printf("Net id: %u\n", net);
 	pcap_t *handle;
 	// open the session
 	handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
