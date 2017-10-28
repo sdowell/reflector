@@ -220,6 +220,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	/* Grab a packet */
 	const u_char *packet;		/* The actual packet */
 	pcap_loop(handle, 1, relayer_got_packet, NULL);
+	printf("Done waiting for response\n");
 	return;
 	packet = pcap_next(handle, &header);
 	printf("Jacked a packet with length of [%d]\n", header.len);
