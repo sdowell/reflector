@@ -69,6 +69,7 @@ u_int32_t r_ip;
 u_int8_t *v_mac;
 u_int8_t *r_mac;
 libnet_t *ln_context;
+char dev[32];
 void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const u_char *payload, u_int32_t payload_s){
 	// Send packet from relayer to attacker
 	printf("Sending packet from relayer to attacker\n");
@@ -193,7 +194,7 @@ int main(int argc, char *argv[])
 	char *victim_eth = NULL;
 	char *relayer_ip = NULL;
 	char *relayer_eth = NULL;
-	char *interface = "eth0";
+	char *interface = NULL;
 	int length;
 	struct bpf_program fp;		/* The compiled filter */
 	char filter_exp[32];	/* The filter expression */
@@ -274,13 +275,18 @@ int main(int argc, char *argv[])
 		return(0);
 	}
 	
-	char *dev, errbuf[PCAP_ERRBUF_SIZE];
+	char errbuf[PCAP_ERRBUF_SIZE];
 	// define the device
-	dev = pcap_lookupdev(errbuf);
-	if (dev == NULL) {
-		fprintf(stderr, "Couldn't find default device: %s\n", errbuf);
-		return(2);
-	}
+	if(interface == NULL){
+		char *tmp = pcap_lookupdev(errbuf);
+		if (tmp == NULL) {
+			fprintf(stderr, "Couldn't find default device: %s\n", errbuf);
+			return(2);
+		}else{
+			strcpy(dev, tmp);
+		}
+	}else
+		strcpy(dev, interface);
 	printf("Device: %s\n", dev);
 	// Find the properties for the device
 	if (pcap_lookupnet(dev, &net, &mask, errbuf) == -1) {
