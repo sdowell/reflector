@@ -302,6 +302,16 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	u_int size_ip;
 	u_int size_tcp;	
 	ethernet = (struct sniff_ethernet*)(packet);
+	printf("Checking packet type\n");
+	struct ether_header *eptr = (struct ether_header *) packet;
+	/* Do a couple of checks to see what packet type we have..*/
+	if (ntohs (eptr->ether_type) == ETHERTYPE_IP)
+    	{
+        printf("Ethernet type hex:%x dec:%d is an IP packet\n",
+                ntohs(eptr->ether_type),
+                ntohs(eptr->ether_type));
+	//relay_IP(ethernet, ip, tcp, ip_payload, ip_payload_s);
+    	
 	ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
 	size_ip = IP_HL(ip)*4;
 	if (size_ip < 20) {
@@ -350,6 +360,18 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
             temp_pointer++;
         }
     }
+	relay_IP(ethernet, ip, tcp, ip_payload, ip_payload_s);
+	}else  if (ntohs (eptr->ether_type) == ETHERTYPE_ARP)
+    	{
+        printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
+                ntohs(eptr->ether_type),
+                ntohs(eptr->ether_type));
+    	}else {
+        	printf("Ethernet type %x not IP", ntohs(eptr->ether_type));
+        	//exit(1);
+    	}
+        printf("\n");
+	return;
 	printf("Checking packet type\n");
 	struct ether_header *eptr = (struct ether_header *) packet;
 	/* Do a couple of checks to see what packet type we have..*/
