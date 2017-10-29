@@ -19,6 +19,17 @@
 		u_char ether_shost[ETHER_ADDR_LEN]; /* Source host address */
 		u_short ether_type; /* IP? ARP? RARP? etc */
 	};
+ 	struct sniff_arp { 
+    		u_int16_t htype;    /* Hardware Type           */ 
+    		u_int16_t ptype;    /* Protocol Type           */ 
+    		u_char hlen;        /* Hardware Address Length */ 
+    		u_char plen;        /* Protocol Address Length */ 
+    		u_int16_t oper;     /* Operation Code          */ 
+    		u_char sha[6];      /* Sender hardware address */ 
+    		u_char spa[4];      /* Sender IP address       */ 
+    		u_char tha[6];      /* Target hardware address */ 
+    		u_char tpa[4];      /* Target IP address       */ 
+	}; 
 
 	/* IP header */
 	struct sniff_ip {
@@ -292,6 +303,41 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	printf("Finished relaying packet\n");
 }
 
+void arp_reply(const struct sniff_arp *arp, const struct sniff_ethernet *ethernet){
+	printf("Handling arp reply\n");
+	
+	
+	// Construct ARP header
+	if ( libnet_autobuild_arp (ARPOP_REPLY,\
+      		v_mac,\
+      		(u_int8_t*)(&v_ip), arp->sha,\
+      		(u_int8_t*)(&arp->spa), ln_context) == -1)
+  	{
+    		fprintf(stderr, "Error building ARP header: %s\n",\
+        	libnet_geterror(ln_context));
+    		libnet_destroy(ln_context);
+    		exit(0);
+  	}
+	printf("Constructing ethernet header\n");
+	// Construct Ethernet header
+	if ( libnet_build_ethernet(ethernet->ether_shost, r_mac, ethernet->ether_type, 
+		NULL, 0, ln_context, 0) == -1 )
+  	{
+    		fprintf(stderr, "Error building Ethernet header: %s\n",\
+        	libnet_geterror(ln_context));
+    		libnet_destroy(ln_context);
+    		exit(0);
+  	}
+	printf("Writing arp reply\n");
+	int bytes_written = libnet_write(ln_context);
+	if ( bytes_written != -1 )
+    		printf("%d bytes written.\n", bytes_written);
+  	else
+    		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
+	
+}
+
+
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
 	printf("Received packet of size %d\n", header->len);
 	const struct sniff_ethernet *ethernet; /* The ethernet header */
@@ -366,6 +412,9 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
         printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
+		const struct sniff_arp *arp; /* The IP header */
+		arp = (struct sniff_arp*)(packet + SIZE_ETHERNET);
+		arp_reply(arp, ethernet);
     	}else {
         	printf("Ethernet type %x not IP", ntohs(eptr->ether_type));
         	//exit(1);
