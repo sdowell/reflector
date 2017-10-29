@@ -312,7 +312,7 @@ void arp_reply(const struct sniff_arp *arp, const struct sniff_ethernet *etherne
 		arp->sha,
       		(u_int8_t*)(&arp->spa),
       		v_mac,
-      		(u_int8_t*)(&v_ip), ln_context) == -1)
+      		(u_int8_t*)(&arp->tpa), ln_context) == -1)
   	{
     		fprintf(stderr, "Error building ARP header: %s\n",\
         	libnet_geterror(ln_context));
@@ -321,7 +321,7 @@ void arp_reply(const struct sniff_arp *arp, const struct sniff_ethernet *etherne
   	}
 	printf("Constructing ethernet header\n");
 	// Construct Ethernet header
-	if ( libnet_build_ethernet(ethernet->ether_shost, r_mac, ethernet->ether_type, 
+	if ( libnet_build_ethernet(ethernet->ether_shost, v_mac, ethernet->ether_type, 
 		NULL, 0, ln_context, 0) == -1 )
   	{
     		fprintf(stderr, "Error building Ethernet header: %s\n",\
