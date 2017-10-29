@@ -306,10 +306,10 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 void arp_reply(const struct sniff_arp *arp, const struct sniff_ethernet *ethernet){
 	printf("Handling arp reply\n");
 	
-	const char *aux = inet_ntoa((struct in_addr)arp->spa);
-	const char *s_ipad = strcpy((char *) malloc(strlen(aux)+1), aux);
-	aux = inet_ntoa((struct in_addr)arp->tpa);
-	const char *d_ipad = strcpy((char *) malloc(strlen(aux)+1), aux);
+	const char *aux;// = inet_ntoa((struct in_addr)arp->spa);
+	const char *s_ipad = arp->spa//strcpy((char *) malloc(strlen(aux)+1), aux);
+	//aux = inet_ntoa((struct in_addr)arp->tpa);
+	const char *d_ipad = arp->tpa;//strcpy((char *) malloc(strlen(aux)+1), aux);
 	aux = ether_ntoa((struct ether_addr *)ethernet->ether_shost);
 	const char *s_host = strcpy((char *) malloc(strlen(aux)+1), aux);
 	aux = ether_ntoa((struct ether_addr *)ethernet->ether_dhost);
