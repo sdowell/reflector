@@ -354,9 +354,9 @@ void arp_reply(const struct sniff_arp *arp, const struct sniff_ethernet *etherne
 	
 	// Construct ARP header
 	if ( libnet_autobuild_arp (ARPOP_REPLY,
-		v_mac,
+		(uint8_t *)(&v_mac),
       		(u_int8_t*)(&arp->tpa),
-      		arp->sha,
+      		(uint8_t *)(&arp->sha),
       		(u_int8_t*)(&arp->spa), ln_context) == -1)
   	{
     		fprintf(stderr, "Error building ARP header: %s\n",\
