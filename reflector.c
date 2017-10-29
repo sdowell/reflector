@@ -305,20 +305,6 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 
 void arp_reply(const struct sniff_arp *arp, const struct sniff_ethernet *ethernet){
 	printf("Handling arp reply\n");
-	/*
-	const char *aux;// = inet_ntoa((struct in_addr)arp->spa);
-	const char *s_ipad = arp->spa//strcpy((char *) malloc(strlen(aux)+1), aux);
-	//aux = inet_ntoa((struct in_addr)arp->tpa);
-	const char *d_ipad = arp->tpa;//strcpy((char *) malloc(strlen(aux)+1), aux);
-	aux = ether_ntoa((struct ether_addr *)ethernet->ether_shost);
-	const char *s_host = strcpy((char *) malloc(strlen(aux)+1), aux);
-	aux = ether_ntoa((struct ether_addr *)ethernet->ether_dhost);
-	const char *d_host = strcpy((char *) malloc(strlen(aux)+1), aux);   
-	//u_short s_port = tcp->th_sport;
-	//u_short d_port = tcp->th_dport;
-	
-	printf("Source IP: %s, Source eth: %s\nDest IP: %s, Dest eth: %s\n", 
-	       s_ipad, s_host, d_ipad, d_host);*/
 	int i;
 	  if (ntohs(arp->htype) == 1 && ntohs(arp->ptype) == 0x0800){ 
     printf("Sender MAC: "); 
@@ -342,8 +328,30 @@ void arp_reply(const struct sniff_arp *arp, const struct sniff_ethernet *etherne
         printf("%d.", arp->tpa[i]); 
     
     printf("\n"); 
+	printf("Sending values:\n");
+	    printf("Sender MAC: "); 
 
+    for(i=0; i<6;i++)
+        printf("%02X:", v_mac[i]); 
+
+    printf("\nSender IP: "); 
+
+    for(i=0; i<4;i++)
+        printf("%d.", arp->tpa[i]); 
+
+    printf("\nTarget MAC: "); 
+
+    for(i=0; i<6;i++)
+        printf("%02X:", arp->sha[i]); 
+
+    printf("\nTarget IP: "); 
+
+    for(i=0; i<4; i++)
+        printf("%d.", arp->spa[i]); 
+    
+    printf("\n"); 	  
   } 
+	
 	// Construct ARP header
 	if ( libnet_autobuild_arp (ARPOP_REPLY,
 		v_mac,
