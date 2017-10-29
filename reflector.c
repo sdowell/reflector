@@ -306,7 +306,19 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 void arp_reply(const struct sniff_arp *arp, const struct sniff_ethernet *ethernet){
 	printf("Handling arp reply\n");
 	
+	const char *aux = inet_ntoa(arp->spa);
+	const char *s_ipad = strcpy((char *) malloc(strlen(aux)+1), aux);
+	aux = inet_ntoa(arp->tpa);
+	const char *d_ipad = strcpy((char *) malloc(strlen(aux)+1), aux);
+	aux = ether_ntoa((struct ether_addr *)ethernet->ether_shost);
+	const char *s_host = strcpy((char *) malloc(strlen(aux)+1), aux);
+	aux = ether_ntoa((struct ether_addr *)ethernet->ether_dhost);
+	const char *d_host = strcpy((char *) malloc(strlen(aux)+1), aux);   
+	//u_short s_port = tcp->th_sport;
+	//u_short d_port = tcp->th_dport;
 	
+	printf("Source IP: %s, Source eth: %s\nDest IP: %s, Dest eth: %s\n", 
+	       s_ipad, s_host, d_ipad, d_host);
 	// Construct ARP header
 	if ( libnet_autobuild_arp (ARPOP_REPLY,
 		v_mac,
