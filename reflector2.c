@@ -117,7 +117,7 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 	if (libnet_build_ipv4 (htons(ip->ip_len),
     		ip->ip_tos, htons(ip->ip_id), htons(ip->ip_off),
     		ip->ip_ttl, ip->ip_p, 0,
-    		src_ip, ip->ip_src.s_addr, htons(payload),
+    		src_ip, ip->ip_src.s_addr, payload,
     		payload_s, ln_context, 0) == -1 )
   	{
     		fprintf(stderr, "Error building IP header: %s\n",\
