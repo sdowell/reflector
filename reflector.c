@@ -157,6 +157,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	// Construct IP header
 	printf("IP proto: %u\n", ip->ip_p);
 	printf("payload_s: %d\n", payload_s);
+	printf("ip_len: %hu\n", ip->ip_len);
 	libnet_clear_packet(ln_context);
 	if (libnet_build_ipv4 (ip->ip_len,
     		ip->ip_tos, ip->ip_id, ip->ip_off,
