@@ -140,6 +140,7 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
     		printf("%d bytes written.\n", bytes_written);
   	else
     		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
+	return bytes_written;
 	
 }
 int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_arp *arp){
@@ -174,6 +175,7 @@ int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *
     		printf("%d bytes written.\n", bytes_written);
   	else
     		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
+	return bytes_written;
 }
 void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
 	printf("Sending response from victim to attacker\n");
