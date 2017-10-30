@@ -193,7 +193,7 @@ void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_
 		ip = strip_ip(header, packet);
 		const u_char *payload;
 		u_int32_t payload_s;
-		u_int size_ip = IP_HL(new_ip)*4;
+		u_int size_ip = IP_HL(ip)*4;
 		printf("Checking ip header length\n");
 		if (size_ip < 20) {
 			printf("   * Invalid IP header length: %u bytes\n", size_ip);
