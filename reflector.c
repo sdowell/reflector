@@ -158,10 +158,12 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	printf("IP proto: %u\n", ip->ip_p);
 	printf("payload_s: %d\n", payload_s);
 	printf("ip_len: %hu\n", ip->ip_len);
+	printf("ip_id: %hu\n", ip->ip_id);
+	printf("ip_off: %hu\n", ip->ip_off);
 	libnet_clear_packet(ln_context);
-	if (libnet_build_ipv4 (ip->ip_len,
-    		ip->ip_tos, ip->ip_id, ip->ip_off,
-    		ip->ip_ttl, ip->ip_p, ip->ip_sum,
+	if (libnet_build_ipv4 (htons(ip->ip_len),
+    		ip->ip_tos, htons(ip->ip_id), htons(ip->ip_off),
+    		ip->ip_ttl, htons(ip->ip_p), 0,
     		r_ip, ip->ip_src.s_addr, payload,
     		payload_s, ln_context, 0) == -1 )
   	{
