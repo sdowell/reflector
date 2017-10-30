@@ -87,7 +87,7 @@ libnet_t *ln_context;
 char dev[32];
 pcap_t *my_handle;
 
-const struct sniff_eth* strip_ethernet(const struct pcap_pkthdr *header, const u_char *packet){
+const struct sniff_ethernet* strip_ethernet(const struct pcap_pkthdr *header, const u_char *packet){
 	const struct sniff_ethernet *ethernet;
 	ethernet = (struct sniff_ethernet*)(packet);
 	return ethernet;
@@ -107,12 +107,12 @@ const struct sniff_ip* strip_ip(const struct pcap_pkthdr *header, const u_char *
 	printf("Checking ip header length\n");
 	if (size_ip < 20) {
 		printf("   * Invalid IP header length: %u bytes\n", size_ip);
-		return;
+		return NULL;
 	}
 	return ip;
 }
 
-int reflect_ip(u_int8_t src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const u_char *payload, u_int32_t payload_s){
+int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const u_char *payload, u_int32_t payload_s){
 	libnet_clear_packet(ln_context);
 	if (libnet_build_ipv4 (htons(ip->ip_len),
     		ip->ip_tos, htons(ip->ip_id), htons(ip->ip_off),
@@ -142,7 +142,7 @@ int reflect_ip(u_int8_t src_mac, u_int32_t src_ip, const struct sniff_ethernet *
     		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
 	
 }
-int arp_spoof(u_int8_t src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_arp *arp){
+int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_arp *arp){
 	libnet_clear_packet(ln_context);
 	// Construct ARP header
 	if ( libnet_autobuild_arp (ARPOP_REPLY,
