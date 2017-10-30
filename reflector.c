@@ -351,7 +351,7 @@ void arp_reply(const struct sniff_arp *arp, const struct sniff_ethernet *etherne
     
     printf("\n"); 	  
   } 
-	
+	libnet_clear_packet(ln_context);
 	// Construct ARP header
 	if ( libnet_autobuild_arp (ARPOP_REPLY,
 		v_mac,
