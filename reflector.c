@@ -167,6 +167,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
     		exit(0);
   	}
 	// Construct Ethernet header
+	printf("Ether_type: %hu\n", ethernet->ether_type);
 	if ( libnet_build_ethernet(ethernet->ether_shost, r_mac, ethernet->ether_type, 
 		NULL, 0, ln_context, 0) == -1 )
   	{
@@ -233,7 +234,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	pcap_dispatch(handle, 1, relayer_got_packet, NULL);
 	printf("Done waiting for response\n");
 	return;
-	packet = pcap_next(handle, &header);
+	//packet = pcap_next(handle, &header);
 	printf("Jacked a packet with length of [%d]\n", header.len);
 	if(packet == NULL){
 		printf("Error: packet is null pointer - %s\n", pcap_geterr(handle));
