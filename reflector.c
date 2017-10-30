@@ -151,7 +151,7 @@ void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_
 	return;	
 }
 
-void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const struct sniff_tcp *tcp, const u_char *payload, u_int32_t payload_s){
+void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const u_char *payload, u_int32_t payload_s){
 	// Send packet from relayer to attacker
 	printf("Sending packet from relayer to attacker\n");
 	// Construct IP header
@@ -412,13 +412,13 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 		printf("   * Invalid IP header length: %u bytes\n", size_ip);
 		return;
 	}
-	tcp = (struct sniff_tcp*)(packet + SIZE_ETHERNET + size_ip);
+	/*tcp = (struct sniff_tcp*)(packet + SIZE_ETHERNET + size_ip);
 	size_tcp = TH_OFF(tcp)*4;
 	if (size_tcp < 20) {
 		printf("   * Invalid TCP header length: %u bytes\n", size_tcp);
 		return;
 	}
-	payload = (u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp);
+	payload = (u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp);*/
 	const u_char *ip_payload = (u_char *)(packet + SIZE_ETHERNET + size_ip);
 	u_int32_t ip_payload_s = header->len - (SIZE_ETHERNET + size_ip);
 	// Record source and dest addresses
@@ -430,11 +430,11 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	const char *s_host = strcpy((char *) malloc(strlen(aux)+1), aux);
 	aux = ether_ntoa((struct ether_addr *)ethernet->ether_dhost);
 	const char *d_host = strcpy((char *) malloc(strlen(aux)+1), aux);   
-	u_short s_port = tcp->th_sport;
-	u_short d_port = tcp->th_dport;
+	//u_short s_port = tcp->th_sport;
+	//u_short d_port = tcp->th_dport;
 	
-	printf("Source IP: %s, Source port: %hu, Source eth: %s\nDest IP: %s, Dest port: %hu, Dest eth: %s\n", 
-	       s_ipad, s_port, s_host, d_ipad, d_port, d_host);
+	printf("Source IP: %s, Source eth: %s\nDest IP: %s, Dest eth: %s\n", 
+	       s_ipad, s_host, d_ipad, d_host);
 	       //inet_ntoa(ip->ip_src), ether_ntoa(ethernet->ether_shost), inet_ntoa(ip->ip_dst),ether_ntoa(ethernet->ether_dhost));
 	//delete[] s_ipad; delete[] d_ipad;delete[] s_host; delete[] d_host;
 	free((void *) s_ipad);
@@ -442,10 +442,9 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	free((void *) d_ipad);
 	free((void *) d_host);
 	/* Print payload in ASCII */
-	printf("header_len = %d, eth = %d, ip = %d, tcp = %d\n", header->len, SIZE_ETHERNET, size_ip, size_tcp);
-       int payload_length = header->len -
-        (SIZE_ETHERNET + size_ip + size_tcp);
-	printf("Payload (len %d):\n", payload_length);
+	printf("header_len = %d, eth = %d, ip = %d\n", header->len, SIZE_ETHERNET, size_ip);
+       //int payload_length = header->len - (SIZE_ETHERNET + size_ip + size_tcp);
+	/*printf("Payload (len %d):\n", payload_length);
     if (payload_length > 0) {
         const u_char *temp_pointer = payload;
         int byte_count = 0;
@@ -453,8 +452,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
             printf("%c", *temp_pointer);
             temp_pointer++;
         }
-    }
-	relay_IP(ethernet, ip, tcp, ip_payload, ip_payload_s);
+    }*/
+	relay_IP(ethernet, ip, ip_payload, ip_payload_s);
 	}else  if (ntohs (eptr->ether_type) == ETHERTYPE_ARP)
     	{
         printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
