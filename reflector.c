@@ -368,7 +368,7 @@ void arp_reply(const struct sniff_arp *arp, const struct sniff_ethernet *etherne
 	// Construct Ethernet header
 	const char *aux = ether_ntoa((struct ether_addr *)ethernet->ether_shost);
 	printf("Source ethernet: %s\n", aux);
-	if ( libnet_build_ethernet(ethernet->ether_shost, v_mac, ethernet->ether_type, 
+	if ( libnet_build_ethernet(ethernet->ether_shost, v_mac, ETHERTYPE_ARP, 
 		NULL, 0, ln_context, 0) == -1 )
   	{
     		fprintf(stderr, "Error building Ethernet header: %s\n",\
