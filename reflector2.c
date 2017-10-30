@@ -146,6 +146,28 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_arp *arp){
 	libnet_clear_packet(ln_context);
 	// Construct ARP header
+								      
+	printf("Sending values:\n");
+	printf("Sender MAC: "); 
+    for(i=0; i<6;i++)
+        printf("%02X:", arp->sha[i]); 
+
+
+    printf("\nSender IP: "); 
+    for(i=0; i<4; i++)
+        printf("%d.", arp->spa[i]);
+
+
+    printf("\nTarget MAC: "); 
+
+    for(i=0; i<6;i++)
+        printf("%02X:", src_mac[i]); 
+
+    printf("\nTarget IP: "); 
+    for(i=0; i<4;i++)
+        printf("%d.", arp->tpa[i]); 
+	
+	
 	u_int8_t *dst_mac;
 	u_int32_t dst_ip;
 	int length;
@@ -194,27 +216,6 @@ int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *
 }
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
 	printf("Sending response from victim to attacker\n");
-	/*								      
-	printf("Sending values:\n");
-	printf("Sender MAC: "); 
-    for(i=0; i<6;i++)
-        printf("%02X:", arp->sha[i]); 
-
-
-    printf("\nSender IP: "); 
-    for(i=0; i<4; i++)
-        printf("%d.", arp->spa[i]);
-
-
-    printf("\nTarget MAC: "); 
-
-    for(i=0; i<6;i++)
-        printf("%02X:", v_mac[i]); 
-
-    printf("\nTarget IP: "); 
-    for(i=0; i<4;i++)
-        printf("%d.", arp->tpa[i]); 
-*/
 	
 	const struct sniff_ethernet *ethernet;
 	ethernet = strip_ethernet(header, packet);
