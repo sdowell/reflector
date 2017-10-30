@@ -323,12 +323,13 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
     		libnet_destroy(ln_context);
     		exit(0);
   	}
+	/*
 	int bytes_written = libnet_write(ln_context);
 	if ( bytes_written != -1 )
     		printf("%d bytes written.\n", bytes_written);
   	else
     		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
-	
+	*/
 	// Receive response from attacker to relayer
 	printf("Receiving response from attacker to relayer\n");
 	/* Find the properties for the device */
@@ -380,6 +381,11 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	const u_char *packet;		/* The actual packet */
 	my_handle = handle;
 	//pcap_dispatch(handle, 1, relayer_got_packet, NULL);
+	int bytes_written = libnet_write(ln_context);
+	if ( bytes_written != -1 )
+    		printf("%d bytes written.\n", bytes_written);
+  	else
+    		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));	
 	pcap_loop(handle, 10, relayer_got_packet, NULL);
 	printf("Done waiting for response\n");
 	return;
