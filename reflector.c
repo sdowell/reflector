@@ -156,6 +156,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	printf("Sending packet from relayer to attacker\n");
 	// Construct IP header
 	printf("IP proto: %u\n", ip->ip_p);
+	libnet_clear_packet(ln_context);
 	if (libnet_build_ipv4 (ip->ip_len,
     		ip->ip_tos, ip->ip_id, ip->ip_off,
     		ip->ip_ttl, ip->ip_p, ip->ip_sum,
@@ -384,7 +385,6 @@ void arp_reply(const struct sniff_arp *arp, const struct sniff_ethernet *etherne
     		printf("%d bytes written.\n", bytes_written);
   	else
     		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
-	libnet_clear_packet(ln_context);
 }
 
 
