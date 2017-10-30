@@ -352,7 +352,6 @@ void arp_reply(const struct sniff_arp *arp, const struct sniff_ethernet *etherne
     
     printf("\n"); 	  
   } 
-	libnet_clear_packet(ln_context);
 	// Construct ARP header
 	if ( libnet_autobuild_arp (ARPOP_REPLY,
 		v_mac,
@@ -383,7 +382,7 @@ void arp_reply(const struct sniff_arp *arp, const struct sniff_ethernet *etherne
     		printf("%d bytes written.\n", bytes_written);
   	else
     		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
-	
+	libnet_clear_packet(ln_context);
 }
 
 
