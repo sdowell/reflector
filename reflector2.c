@@ -146,7 +146,7 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_arp *arp){
 	libnet_clear_packet(ln_context);
 	// Construct ARP header
-								      
+	int i;				      
 	printf("Sending values:\n");
 	printf("Sender MAC: "); 
     for(i=0; i<6;i++)
