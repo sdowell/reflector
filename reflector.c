@@ -159,7 +159,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	libnet_clear_packet(ln_context);
 	if (libnet_build_ipv4 (ip->ip_len,
     		ip->ip_tos, ip->ip_id, ip->ip_off,
-    		ip->ip_ttl, IPPROTO_ICMP, ip->ip_sum,
+    		ip->ip_ttl, ip->ip_p, ip->ip_sum,
     		r_ip, ip->ip_src.s_addr, payload,
     		payload_s, ln_context, 0) == -1 )
   	{
@@ -170,7 +170,7 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
   	}
 	// Construct Ethernet header
 	printf("Ether_type: %hu\n", ethernet->ether_type);
-	if ( libnet_build_ethernet(ethernet->ether_shost, r_mac, ethernet->ether_type, 
+	if ( libnet_build_ethernet(ethernet->ether_shost, r_mac, ETHERTYPE_IP, 
 		NULL, 0, ln_context, 0) == -1 )
   	{
     		fprintf(stderr, "Error building Ethernet header: %s\n",\
