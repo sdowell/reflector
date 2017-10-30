@@ -88,7 +88,7 @@ char dev[32];
 pcap_t *my_handle;
 
 const struct sniff_eth* strip_ethernet(const struct pcap_pkthdr *header, const u_char *packet){
-	const struct sniff_eth *ethernet;
+	const struct sniff_ethernet *ethernet;
 	ethernet = (struct sniff_ethernet*)(packet);
 	return ethernet;
 }
@@ -103,7 +103,7 @@ const struct sniff_ip* strip_ip(const struct pcap_pkthdr *header, const u_char *
 	const struct sniff_ip *ip;
 	ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
 	printf("Calling IP_HL\n");
-	size_ip = IP_HL(new_ip)*4;
+	int size_ip = IP_HL(ip)*4;
 	printf("Checking ip header length\n");
 	if (size_ip < 20) {
 		printf("   * Invalid IP header length: %u bytes\n", size_ip);
@@ -112,7 +112,7 @@ const struct sniff_ip* strip_ip(const struct pcap_pkthdr *header, const u_char *
 	return ip;
 }
 
-int reflect_ip(u_int8_t src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_ip *ip){
+int reflect_ip(u_int8_t src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const u_char *payload, u_int32_t payload_s){
 	libnet_clear_packet(ln_context);
 	if (libnet_build_ipv4 (htons(ip->ip_len),
     		ip->ip_tos, htons(ip->ip_id), htons(ip->ip_off),
