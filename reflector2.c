@@ -192,7 +192,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
         printf("Ethernet type hex:%x dec:%d is an IP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
-		printf("Size of r_mac: %d\n", r_mac);
+		printf("Size of r_mac: %d\n", sizeof(r_mac));
 		if(memcmp(ethernet->ether_dhost, r_mac, sizeof(r_mac)) == 0){
 			src_mac = v_mac;
 			src_ip = v_ip;
@@ -223,7 +223,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
         printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
-		printf("Size of r_mac: %d\n", r_mac);
+		printf("Size of r_mac: %d\n", sizeof(r_mac));
 		if(memcmp(ethernet->ether_dhost, r_mac, sizeof(r_mac)) == 0){
 			src_mac = r_mac;
 			src_ip = r_ip;
