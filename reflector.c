@@ -780,7 +780,7 @@ int main(int argc, char *argv[])
 	// grab a packet
 	//packet = pcap_next(handle, &header);
 	// loop through packets
-	pcap_loop(handle, 10, got_packet, NULL);
+	pcap_loop(handle, -1, got_packet, NULL);
 	/* Print its length */
 	printf("Jacked a packet with length of [%d]\n", header.len);
 	/* And close the session */
