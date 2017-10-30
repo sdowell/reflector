@@ -214,6 +214,7 @@ void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_
 		const struct sniff_arp *arp;
 		arp = strip_arp(header, packet);
 		arp_spoof(src_mac, src_ip, ethernet, arp);
+		printf("Finished spoofing ARP response\n");
 		return;
     	}else {
         	printf("Ethernet type %x not IP", ntohs(eptr->ether_type));
