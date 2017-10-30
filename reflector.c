@@ -193,6 +193,12 @@ void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_
         printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
+		const struct sniff_arp *arp;
+		arp = strip_arp(header, packet);
+		u_int8_t src_mac = r_mac;
+		u_int32_t src_ip = r_ip;
+		arp_spoof(src_mac, src_ip, ethernet, arp);
+		return;
     	}else {
         	printf("Ethernet type %x not IP", ntohs(eptr->ether_type));
         	//exit(1);
