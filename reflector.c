@@ -86,17 +86,20 @@ char *r_macs;
 libnet_t *ln_context;
 char dev[32];
 pcap_t *my_handle;
-const struct * strip_ethernet(const struct pcap_pkthdr *header, const u_char *packet){
+
+const struct* strip_ethernet(const struct pcap_pkthdr *header, const u_char *packet){
 	const struct *ethernet;
 	ethernet = (struct sniff_ethernet*)(packet);
 	return ethernet;
 }
-const struct * strip_arp(const struct pcap_pkthdr *header, const u_char *packet){
+
+const struct* strip_arp(const struct pcap_pkthdr *header, const u_char *packet){
 	const struct *arp;
 	arp = (struct sniff_arp*)(packet + SIZE_ETHERNET);
 	return arp;
 }
-const struct * strip_ip(const struct pcap_pkthdr *header, const u_char *packet){
+
+const struct* strip_ip(const struct pcap_pkthdr *header, const u_char *packet){
 	const struct *ip;
 	ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
 	printf("Calling IP_HL\n");
@@ -108,6 +111,7 @@ const struct * strip_ip(const struct pcap_pkthdr *header, const u_char *packet){
 	}
 	return ip;
 }
+
 int reflect_ip(u_int8_t src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_ip *ip){
 	libnet_clear_packet(ln_context);
 	if (libnet_build_ipv4 (htons(ip->ip_len),
