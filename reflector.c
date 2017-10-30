@@ -87,20 +87,20 @@ libnet_t *ln_context;
 char dev[32];
 pcap_t *my_handle;
 
-const struct* strip_ethernet(const struct pcap_pkthdr *header, const u_char *packet){
-	const struct *ethernet;
+const struct sniff_eth* strip_ethernet(const struct pcap_pkthdr *header, const u_char *packet){
+	const struct sniff_eth *ethernet;
 	ethernet = (struct sniff_ethernet*)(packet);
 	return ethernet;
 }
 
-const struct* strip_arp(const struct pcap_pkthdr *header, const u_char *packet){
-	const struct *arp;
+const struct sniff_arp* strip_arp(const struct pcap_pkthdr *header, const u_char *packet){
+	const struct sniff_arp *arp;
 	arp = (struct sniff_arp*)(packet + SIZE_ETHERNET);
 	return arp;
 }
 
-const struct* strip_ip(const struct pcap_pkthdr *header, const u_char *packet){
-	const struct *ip;
+const struct sniff_ip* strip_ip(const struct pcap_pkthdr *header, const u_char *packet){
+	const struct sniff_ip *ip;
 	ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
 	printf("Calling IP_HL\n");
 	size_ip = IP_HL(new_ip)*4;
