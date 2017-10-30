@@ -184,14 +184,15 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	const struct sniff_ethernet *ethernet;
 	ethernet = strip_ethernet(header, packet);
 	struct ether_header *eptr = (struct ether_header *) packet;
+	u_int8_t *src_mac;
+	u_int32_t src_ip;
 	// Do a couple of checks to see what packet type we have..
 	if (ntohs (eptr->ether_type) == ETHERTYPE_IP)
     	{
         printf("Ethernet type hex:%x dec:%d is an IP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
-		u_int8_t *src_mac;
-		u_int32_t src_ip;
+		printf("Size of r_mac: %d\n", r_mac);
 		if(memcmp(ethernet->ether_dhost, r_mac, sizeof(r_mac)) == 0){
 			src_mac = v_mac;
 			src_ip = v_ip;
@@ -222,6 +223,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
         printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
+		printf("Size of r_mac: %d\n", r_mac);
 		if(memcmp(ethernet->ether_dhost, r_mac, sizeof(r_mac)) == 0){
 			src_mac = r_mac;
 			src_ip = r_ip;
