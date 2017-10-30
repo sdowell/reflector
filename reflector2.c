@@ -246,10 +246,10 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 		const struct sniff_arp *arp;
 		arp = strip_arp(header, packet);
 		printf("Size of r_mac: %lu\n", sizeof(r_mac));
-		if(memcmp(arp->tpa, r_ip, 4) == 0){
+		if(memcmp(arp->tpa, &r_ip, 4) == 0){
 			src_mac = r_mac;
 			src_ip = r_ip;
-		}else if(memcmp(arp->tpa, v_ip, 4) == 0){
+		}else if(memcmp(arp->tpa, &v_ip, 4) == 0){
 			src_mac = v_mac;
 			src_ip = v_ip;
 		}else{
