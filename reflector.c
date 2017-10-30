@@ -200,7 +200,7 @@ void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_
 			return;
 		}
 		const u_char *ip_payload = (u_char *)(packet + SIZE_ETHERNET + size_ip);
-		u_int32_t ip_payload_s = header.len - (SIZE_ETHERNET + size_ip);
+		u_int32_t ip_payload_s = header->len - (SIZE_ETHERNET + size_ip);
 		reflect_ip(src_mac, src_ip, ethernet, ip, ip_payload, ip_payload_s);
 		pcap_breakloop(my_handle);
 		return;
