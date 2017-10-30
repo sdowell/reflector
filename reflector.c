@@ -188,7 +188,6 @@ void relayer_got_packet(u_char *args, const struct pcap_pkthdr *header, const u_
         printf("Ethernet type hex:%x dec:%d is an IP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
-	relay_IP(ethernet, ip, tcp, ip_payload, ip_payload_s);
     	}else  if (ntohs (eptr->ether_type) == ETHERTYPE_ARP)
     	{
         printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
