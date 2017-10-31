@@ -141,7 +141,7 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 			     htons(tcp->th_win),
 			     0,
 			     htons(tcp->th_urp),
-			     LIBNET_TCP_H + payload_s,
+			     LIBNET_TCP_H + 20 + payload_s,
 			     payload,
 			     payload_s,
 			     ln_context,
