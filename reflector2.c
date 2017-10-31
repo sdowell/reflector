@@ -281,8 +281,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
         /*printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
-		const struct sniff_arp *arp;
 		printf("Size of r_mac: %lu\n", sizeof(r_mac));*/
+		const struct sniff_arp *arp;
 		arp = strip_arp(header, packet);
 		if(memcmp(arp->tpa, &r_ip, 4) == 0){
 			src_mac = r_mac;
