@@ -121,6 +121,38 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 		printf("%x", payload[i]);
 		//n_payload[i] = payload[payload_s-(i+1)];*/
 	printf("\"\n");
+	u_int size_ip;
+	u_int size_tcp;	
+	const struct sniff_tcp *tcp; /* The TCP header */
+	size_ip = IP_HL(ip)*4;
+	tcp = (struct sniff_tcp*)(packet + SIZE_ETHERNET + size_ip);
+	size_tcp = TH_OFF(tcp)*4;
+	if (size_tcp < 20) {
+		printf("   * Invalid TCP header length: %u bytes\n", size_tcp);
+		return;
+	}
+	payload = (u_char *)(payload + size_tcp);
+	payload_s = payload_s - size_tcp;
+	if (libnet_build_tcp(tcp->th_sport,
+			     tcp->th_dport,
+			     tcp->th_seq,
+			     tcp->th_ack,
+			     tcp->th_flags,
+			     tcp->th_win,
+			     0,
+			     tcp->urp,
+			     LIBNET_TCP_H + payload_s,
+			     payload,
+			     payload_s,
+			     ln_context,
+			     0) == -1){
+		fprintf(stderr, "Error building TCP header: %s\n",\
+        	libnet_geterror(ln_context));
+    		libnet_destroy(ln_context);
+    		exit(0);
+	}
+	
+	
 	if (libnet_build_ipv4 (htons(ip->ip_len),
     		ip->ip_tos, htons(ip->ip_id), htons(ip->ip_off),
     		ip->ip_ttl, ip->ip_p, 0,
