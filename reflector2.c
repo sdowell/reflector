@@ -127,10 +127,10 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 		//n_payload[i] = payload[payload_s-(i+1)];
 	printf("\"\n");*/
 	if(ip->ip_p == IPPROTO_TCP){
-		u_int size_ip;
+		//u_int size_ip;
 		u_int size_tcp;	
 		const struct sniff_tcp *tcp; /* The TCP header */
-		size_ip = IP_HL(ip)*4;
+		//size_ip = IP_HL(ip)*4;
 		tcp = (struct sniff_tcp*)(payload);
 		size_tcp = TH_OFF(tcp)*4;
 		if (size_tcp < 20) {
