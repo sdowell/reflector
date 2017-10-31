@@ -114,10 +114,13 @@ const struct sniff_ip* strip_ip(const struct pcap_pkthdr *header, const u_char *
 
 int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const u_char *payload, u_int32_t payload_s){
 	libnet_clear_packet(ln_context);
-	/*u_char n_payload[payload_s];
+	//u_char n_payload[payload_s];
 	int i;
+	printf("Payload: \"");
 	for(i = 0; i < payload_s; i++)
-		n_payload[i] = payload[payload_s-(i+1)];*/
+		printf("%x", payload[i]);
+		//n_payload[i] = payload[payload_s-(i+1)];*/
+	printf("\"\n");
 	if (libnet_build_ipv4 (htons(ip->ip_len),
     		ip->ip_tos, htons(ip->ip_id), htons(ip->ip_off),
     		ip->ip_ttl, ip->ip_p, 0,
