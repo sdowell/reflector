@@ -127,7 +127,7 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 		//n_payload[i] = payload[payload_s-(i+1)];
 	printf("\"\n");*/
 	if(ip->ip_p == IPPROTO_TCP){
-		u_int size_ip;
+		//u_int size_ip;
 		u_int size_tcp;	
 		const struct sniff_tcp *tcp; /* The TCP header */
 		size_ip = IP_HL(ip)*4;
@@ -135,7 +135,7 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 		size_tcp = TH_OFF(tcp)*4;
 		if (size_tcp < 20) {
 			printf("   * Invalid TCP header length: %u bytes\n", size_tcp);
-			return;
+			return -1;
 		}
 		payload = (u_char *)(payload + 20);
 		payload_s = payload_s - 20;
@@ -309,8 +309,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 		}
 		const struct sniff_ip *ip;
 		ip = strip_ip(header, packet);
-		const u_char *payload;
-		u_int32_t payload_s;
+		//const u_char *payload;
+		//u_int32_t payload_s;
 		u_int size_ip = IP_HL(ip)*4;
 		printf("Checking ip header length\n");
 		if (size_ip < 20) {
