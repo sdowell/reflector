@@ -133,14 +133,14 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 	}
 	payload = (u_char *)(payload + size_tcp);
 	payload_s = payload_s - size_tcp;
-	if (libnet_build_tcp(tcp->th_sport,
-			     tcp->th_dport,
-			     tcp->th_seq,
-			     tcp->th_ack,
+	if (libnet_build_tcp(htons(tcp->th_sport),
+			     htons(tcp->th_dport),
+			     htonl((u_int32_t)tcp->th_seq),
+			     htonl((u_int32_t)tcp->th_ack),
 			     tcp->th_flags,
-			     tcp->th_win,
+			     htons(tcp->th_win),
 			     0,
-			     tcp->th_urp,
+			     htons(tcp->th_urp),
 			     LIBNET_TCP_H + payload_s,
 			     payload,
 			     payload_s,
