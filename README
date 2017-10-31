@@ -1,0 +1,9 @@
+CREDENTIALS: M3g45up3R5Z3kre7P4s5w0rd
+
+How I obtained the credentials:
+
+First, I observed the sequence number generation of the service by sending SYN packets from my local host machine and recording the sequence numbers from the SYN-ACK messages.
+
+After doing this, I realized that by sending SYN messages in quick succession the service will generate the same sequence number for two separate handshakes.
+
+To exploit this, I created a program which sends a SYN packet from my localhost and from the trusted IP (two separate SYN packets). Once I receive the SYN-ACK at my localhost, I then send an ACK packet from the trusted IP using the sequence number from the SYN-ACK. I then send a payload with the IP address of a host in which I am ready to receive a UDP packet.
