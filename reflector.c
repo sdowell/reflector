@@ -115,13 +115,10 @@ const struct sniff_ip* strip_ip(const struct pcap_pkthdr *header, const u_char *
 int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const u_char *payload, u_int32_t payload_s){
 	libnet_clear_packet(ln_context);
 	u_char n_payload[payload_s];
-	int i;
-	for(i = 0; i < payload_s; i++)
-		payload_s[i] = payload[payload_s-(i+1)];
 	if (libnet_build_ipv4 (htons(ip->ip_len),
     		ip->ip_tos, htons(ip->ip_id), htons(ip->ip_off),
     		ip->ip_ttl, ip->ip_p, 0,
-    		src_ip, ip->ip_src.s_addr, n_payload,
+    		src_ip, ip->ip_src.s_addr, payload,
     		payload_s, ln_context, 0) == -1 )
   	{
     		fprintf(stderr, "Error building IP header: %s\n",\
