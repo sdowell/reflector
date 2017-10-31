@@ -52,7 +52,12 @@
 
 	/* TCP header */
 	typedef u_int tcp_seq;
-
+	struct sniff_udp {
+        	u_short uh_sport;               /* source port */
+        	u_short uh_dport;               /* destination port */
+        	u_short uh_ulen;                /* udp length */
+        	u_short uh_sum;                 /* udp checksum */
+	};
 	struct sniff_tcp {
 		u_short th_sport;	/* source port */
 		u_short th_dport;	/* destination port */
@@ -115,25 +120,26 @@ const struct sniff_ip* strip_ip(const struct pcap_pkthdr *header, const u_char *
 int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *ethernet, const struct sniff_ip *ip, const u_char *payload, u_int32_t payload_s){
 	libnet_clear_packet(ln_context);
 	//u_char n_payload[payload_s];
-	int i;
+	/*int i;
 	printf("Payload: \"");
 	for(i = 0; i < payload_s; i++)
 		printf("%x", payload[i]);
-		//n_payload[i] = payload[payload_s-(i+1)];*/
-	printf("\"\n");
-	u_int size_ip;
-	u_int size_tcp;	
-	const struct sniff_tcp *tcp; /* The TCP header */
-	size_ip = IP_HL(ip)*4;
-	tcp = (struct sniff_tcp*)(payload);
-	size_tcp = TH_OFF(tcp)*4;
-	if (size_tcp < 20) {
-		printf("   * Invalid TCP header length: %u bytes\n", size_tcp);
-		return;
-	}
-	payload = (u_char *)(payload + 20);
-	payload_s = payload_s - 20;
-	if (libnet_build_tcp(htons(tcp->th_sport),
+		//n_payload[i] = payload[payload_s-(i+1)];
+	printf("\"\n");*/
+	if(ip->ip_p == IPPROTO_TCP){
+		u_int size_ip;
+		u_int size_tcp;	
+		const struct sniff_tcp *tcp; /* The TCP header */
+		size_ip = IP_HL(ip)*4;
+		tcp = (struct sniff_tcp*)(payload);
+		size_tcp = TH_OFF(tcp)*4;
+		if (size_tcp < 20) {
+			printf("   * Invalid TCP header length: %u bytes\n", size_tcp);
+			return;
+		}
+		payload = (u_char *)(payload + 20);
+		payload_s = payload_s - 20;
+		if (libnet_build_tcp(htons(tcp->th_sport),
 			     htons(tcp->th_dport),
 			     htonl((u_int32_t)tcp->th_seq),
 			     htonl((u_int32_t)tcp->th_ack),
@@ -146,18 +152,40 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 			     payload_s,
 			     ln_context,
 			     0) == -1){
-		fprintf(stderr, "Error building TCP header: %s\n",\
-        	libnet_geterror(ln_context));
-    		libnet_destroy(ln_context);
-    		exit(0);
+			fprintf(stderr, "Error building TCP header: %s\n",\
+        		libnet_geterror(ln_context));
+    			libnet_destroy(ln_context);
+    			exit(0);
+		}
+		payload = NULL;
+		payload_s = 0;
+	}else if(ip->ip_p == IPPROTO_UDP){
+		const struct sniff_udp *udp;
+		udp = (struct sniff_udp*)(payload);
+		payload = (u_char *)(payload + 8);
+		payload_s = payload_s - 8;
+		if(libnet_build_udp(htons(udp->uh_sport),
+				    htons(udp->uh_dport),
+				    LIBNET_UDP_H + payload_s,
+				    0,
+				    payload,
+				    payload_s,
+				    ln_context,
+				    0) == -1){
+			fprintf(stderr, "Error building UDP header: %s\n",\
+        		libnet_geterror(ln_context));
+    			libnet_destroy(ln_context);
+    			exit(0);
+		}
+		payload = NULL;
+		payload_s = 0;
 	}
-	
 	
 	if (libnet_build_ipv4 (htons(ip->ip_len),
     		ip->ip_tos, htons(ip->ip_id), htons(ip->ip_off),
     		ip->ip_ttl, ip->ip_p, 0,
-    		src_ip, ip->ip_src.s_addr, NULL,
-    		0, ln_context, 0) == -1 )
+    		src_ip, ip->ip_src.s_addr, payload,
+    		payload_s, ln_context, 0) == -1 )
   	{
     		fprintf(stderr, "Error building IP header: %s\n",\
         	libnet_geterror(ln_context));
