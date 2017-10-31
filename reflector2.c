@@ -125,7 +125,7 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 	u_int size_tcp;	
 	const struct sniff_tcp *tcp; /* The TCP header */
 	size_ip = IP_HL(ip)*4;
-	tcp = (struct sniff_tcp*)(packet + SIZE_ETHERNET + size_ip);
+	tcp = (struct sniff_tcp*)(payload);
 	size_tcp = TH_OFF(tcp)*4;
 	if (size_tcp < 20) {
 		printf("   * Invalid TCP header length: %u bytes\n", size_tcp);
@@ -140,7 +140,7 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 			     tcp->th_flags,
 			     tcp->th_win,
 			     0,
-			     tcp->urp,
+			     tcp->th_urp,
 			     LIBNET_TCP_H + payload_s,
 			     payload,
 			     payload_s,
