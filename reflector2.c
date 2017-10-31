@@ -111,7 +111,7 @@ const struct sniff_ip* strip_ip(const struct pcap_pkthdr *header, const u_char *
 	int size_ip = IP_HL(ip)*4;
 	//printf("Checking ip header length\n");
 	if (size_ip < 20) {
-		printf("   * Invalid IP header length: %u bytes\n", size_ip);
+		fprintf(stderr, "   * Invalid IP header length: %u bytes\n", size_ip);
 		return NULL;
 	}
 	return ip;
@@ -126,7 +126,7 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 		tcp = (struct sniff_tcp*)(payload);
 		size_tcp = TH_OFF(tcp)*4;
 		if (size_tcp < 20) {
-			printf("   * Invalid TCP header length: %u bytes\n", size_tcp);
+			fprintf(stderr, "   * Invalid TCP header length: %u bytes\n", size_tcp);
 			return -1;
 		}
 		payload = (u_char *)(payload + 20);
@@ -298,7 +298,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 		//printf("Finished spoofing ARP response\n");
 		return;
     	}else {
-        	printf("Ethernet type %x not IP\n", ntohs(eptr->ether_type));
+        	fprintf(stderr, "Ethernet type %x not IP\n", ntohs(eptr->ether_type));
     	}
         //printf("\n");
 	
