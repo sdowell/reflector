@@ -148,8 +148,8 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 			     0) == -1){
 			fprintf(stderr, "Error building TCP header: %s\n",\
         		libnet_geterror(ln_context));
-    			libnet_destroy(ln_context);
-    			exit(0);
+    			//libnet_destroy(ln_context);
+    			return -1;
 		}
 		payload = NULL;
 		payload_s = 0;
@@ -168,8 +168,8 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
 				    0) == -1){
 			fprintf(stderr, "Error building UDP header: %s\n",\
         		libnet_geterror(ln_context));
-    			libnet_destroy(ln_context);
-    			exit(0);
+    			//libnet_destroy(ln_context);
+    			return -1;
 		}
 		payload = NULL;
 		payload_s = 0;
@@ -183,8 +183,8 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
   	{
     		fprintf(stderr, "Error building IP header: %s\n",\
         	libnet_geterror(ln_context));
-    		libnet_destroy(ln_context);
-    		exit(0);
+    		//libnet_destroy(ln_context);
+    		return -1;
   	}
 	// Construct Ethernet header
 	//printf("Ether_type: %hu\n", ethernet->ether_type);
@@ -193,8 +193,8 @@ int reflect_ip(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet 
   	{
     		fprintf(stderr, "Error building Ethernet header: %s\n",\
         	libnet_geterror(ln_context));
-    		libnet_destroy(ln_context);
-    		exit(0);
+    		//libnet_destroy(ln_context);
+    		return -1;
   	}
 	int bytes_written = libnet_write(ln_context);
 	if ( bytes_written != -1 )
@@ -216,8 +216,8 @@ int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *
   	{
     		fprintf(stderr, "Error building ARP header: %s\n",\
         	libnet_geterror(ln_context));
-    		libnet_destroy(ln_context);
-    		exit(0);
+    		//libnet_destroy(ln_context);
+    		return -1;
   	}
 	//printf("Constructing ethernet header\n");
 	// Construct Ethernet header
@@ -228,8 +228,8 @@ int arp_spoof(u_int8_t *src_mac, u_int32_t src_ip, const struct sniff_ethernet *
   	{
     		fprintf(stderr, "Error building Ethernet header: %s\n",\
         	libnet_geterror(ln_context));
-    		libnet_destroy(ln_context);
-    		exit(0);
+    		//libnet_destroy(ln_context);
+    		return -1;
   	}
 	//printf("Writing arp reply\n");
 	int bytes_written = libnet_write(ln_context);
